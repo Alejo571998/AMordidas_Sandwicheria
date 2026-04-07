@@ -1,0 +1,909 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Montserrat;
+}
+
+.hero_header {
+  height: 100vh;
+  background-image: 
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url(../assets/img/fondoa.png);
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+  .seccionNav {
+    display: flex;
+    align-items: center;
+    padding: 15px 0px;
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.3);
+    .imagenHeader {
+      .logo {
+        width: 110px;
+        transition: transform 0.3s ease;
+      }
+    }
+    .navegacion {
+      display: flex;
+      justify-content: center;
+      width: 88%;
+
+      .listaNav {
+        display: flex;
+        list-style: none;
+        gap: 25px;
+
+        .linkNav {
+          position: relative;
+          font-weight: 500;
+          text-decoration: none;
+          color: #fff;
+          transition: all 0.3s ease;
+
+          &:hover {
+            color: rgb(115, 115, 115);
+          }
+          &::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: rgb(173, 173, 173);
+            transition: width 0.3s ease;
+          }
+
+          &:hover::after {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  .seccionTitulo {
+    height: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    line-height: 1.5;
+    margin-left: 50px;
+    padding-bottom: 40px;
+
+    .tituloPrincipal {
+      font-size: 3.5rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+
+    .parrafoTitulo {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #ccc;
+      margin-top: 10px;
+    }
+
+    .linkMenu {
+      background: linear-gradient(135deg, rgb(92, 92, 92), #fdfdfd);
+      font-weight: 600;
+      display: inline-block;
+      width: 140px;
+      color: #000;
+      text-decoration: none;
+      text-align: center;
+      padding: 12px 0;
+      border-radius: 8px;
+      margin-top: 25px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(92, 92, 92, 0.4);
+      }
+    }
+  }
+}
+.simple_header{
+        background-color: rgb(0, 0, 0);
+        padding: 7px 0px;
+        .seccionNav{
+            display: flex;
+            align-items: center;
+            .imagenHeader{
+                margin-left: 20px;
+                .logo{
+                    width: 110px;
+                }
+            }
+        .navegacion{
+            display: flex;
+            justify-content: center;
+            width: 88%;
+            .listaNav{
+                display: flex;
+                list-style: none;
+                .linkNav{
+                    font-weight: 500;
+                    text-decoration: none;
+                    margin-right: 20px;
+                    margin-left: 15px;            
+                    color: whitesmoke;
+                    transition: all 0.3s ease;
+                    &:hover {
+                        color: rgb(115, 115, 115);
+                    }
+                }
+            }
+    
+        }   
+    }
+}
+.mainIndex{
+    .tarjetaPanes {
+        padding: 60px 20px;
+        background: #0f0f0f;
+        text-align: center;
+
+        .tituloPanes {
+          font-size: 32px;
+          color: #fff;
+          margin-bottom: 10px;
+          letter-spacing: 2px;
+        }
+        .lineaPanes {
+            width: 80px;
+            height: 3px;
+            background: rgb(117, 98, 60);
+            border: none;
+            margin: 0 auto 40px auto;
+        }
+
+        .contendorTarjetas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            margin: auto;
+            .seccionTarjeta {
+                position: relative;
+                overflow: hidden;
+                border-radius: 20px;
+                cursor: pointer;
+                transition: transform 0.4s ease, box-shadow 0.4s ease;
+                &:hover {
+                transform: translateY(-10px) scale(1.02);
+                box-shadow: 0 20px 40px rgba(174, 98, 60, 0.2);
+                }
+                .imgTarjeta {
+                width: 100%;
+                height: 280px;
+                object-fit: cover;
+                transition: transform 0.5s ease;
+                }
+                &:hover .imgTarjeta {
+                transform: scale(1.1);
+                }
+                &::after {
+                    content: "";
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient( to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2), transparent
+                    );
+                }
+                .textoTarjeta {
+                    position: absolute;
+                    bottom: 20px;
+                    left: 20px;
+                    color: #fff;
+                    font-size: 20px;
+                    font-weight: bold;
+                    z-index: 2;
+                    letter-spacing: 1px;
+                }
+            }
+        } 
+    }
+    .SeccionSanguches{
+        background: #0f0f0f;
+        color: #fff;
+        width: 90%;
+        margin: 80px auto;
+        padding: 50px 30px;
+        border-radius: 30px;
+        .tituloSanguches{
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.7rem;
+            .pSanguches{
+                color: rgb(117, 98, 60);
+                font-size: 1.7rem;
+            }
+        }
+        .lineaPanes{
+            width: 30%;
+            margin: 10px auto;
+        }
+        .contendorSanguches{
+            display: flex;
+            justify-content: center;;
+            margin-bottom: 25px;
+            .descripcionSanguches{
+                display: flex;
+                flex-direction: column;
+                text-align: right;
+                width: 300px;
+                margin-top: 40px;
+                padding-right: 20px;
+                padding-left: 10px;
+                font-size: 0.9rem;
+                line-height: 1.3rem;
+                .tituloSanguche{
+                    font-size: 1rem;
+                    margin-top: 5px;
+                    color: rgb(117, 98, 60);
+                }
+            }
+            .descripcionSanguches2{
+                display: flex;
+                flex-direction: column;
+                text-align: left;
+                margin-top: 40px;
+                width: 300px;
+                height: 300px;
+                padding-left: 20px;
+                padding-right: 10px;
+                font-size: 0.9rem;
+                line-height: 1.3rem;
+                .tituloSanguche{
+                    font-size: 1rem;
+                    margin-top: 5px;
+                    color: rgb(117, 98, 60);
+                }
+            }
+            .seccionImgSanguche{
+
+                position: relative;
+                border-radius: 25px;
+                overflow: hidden;
+                            width: 420px;
+                            height: 480px;
+                .ImgSanguche {
+                    width: 420px;
+                            height: 480px;
+                    object-fit: cover;
+                    border-radius: 25px;
+                    transition: transform 0.5s ease;
+                }
+                &:hover .ImgSanguche {
+                    transform: scale(1.05);
+                }
+                &::after {
+                    content: "";
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient( to top, rgba(0, 0, 0, 0.7), transparent );
+                }
+            }
+        }
+    }
+    .SeccionCreadores{
+        margin: auto;
+        margin-top: 80px;
+        margin-bottom: 30px;
+        text-align: center;
+        background-color: rgb(21, 21, 21);
+        .tituloCreadores{
+            color: whitesmoke;
+            padding: 24px;
+        }
+        .Creadores{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgb(21, 21, 21);
+            color: whitesmoke;
+            .ParrafoCreadores{
+                width: 80%; 
+                margin: 0 auto;
+                text-align: center;
+            }
+            .imagenFlotante{
+                margin-top: 20px;
+                margin-bottom: 35px;
+                width: 300px;
+                height: 300px;
+                border-radius: 35px;
+            }
+        }
+        
+    }
+}
+.mainMenu{
+    .tituloMenu{
+        text-align: center;
+        margin: 80px 0px 80px 0px;
+    }
+    .menu {
+        max-width: 1100px;
+        margin: auto;
+        margin-bottom : 80px;
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-auto-rows: 250px;
+            gap: 15px;
+        .card {
+            position: relative;
+            overflow: hidden;
+        }
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .card .info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: rgb(0, 0, 0);
+        }
+        .grande {
+            grid-row: span 2;
+        }
+        .alta {
+            grid-row: span 2;
+        }
+        }
+    }
+}
+.formulario{
+    max-width:500px;
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+    margin-bottom: 50px;
+}
+ .tituloFormularios{
+        text-align: center;
+        margin-top: 40px;
+        margin-bottom: 80px;
+    }
+    .campo{
+    display:flex;
+    flex-direction:column;
+    }
+    label{
+    margin-bottom:5px;
+    font-weight:bold;
+    }
+    input, textarea, select{
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    font-size:16px;
+    }
+    button{
+    margin-top:10px;
+    padding:12px;
+    background:black;
+    color:white;
+    border:none;
+    cursor:pointer;
+    font-size:16px;
+    transition:0.3s;
+    }
+    button:hover{   
+    background:#333;
+}
+
+.footer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 50px;
+    height: 40vh;
+    background-color: rgb(21, 21, 21);
+    color: white;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    .seccionFooter{
+        display: flex;
+        .navegacionFooter{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 50px;
+            .DondeIr{
+                margin-bottom: 15px;
+            }
+            .listaNavFooter{
+                list-style: none;
+                li{
+                    margin-bottom: 10px;
+                    a{
+                        text-decoration: none;
+                        color: whitesmoke;
+                        position: relative;
+                        transition: all 0.3s ease;
+
+                        &:hover {
+                        color: #9b9b9b;
+                        }
+
+                        &::after {
+                        content: "";
+                        position: absolute;
+                        left: 0;
+                        bottom: -3px;
+                        width: 0%;
+                        height: 2px;
+                        background: #9d9d9d;
+                        transition: width 0.3s ease;
+                        }
+                        &:hover::after {
+                        width: 100%;
+                        }
+                    }
+                }
+            }    
+        }
+    }
+    .seccionFooterPedinos{
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        .fa-whatsapp{
+        color: white;
+        font-size: 2rem;
+        margin: 5px auto;
+        transition: all 0.3s ease;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+        }
+        }
+        .icon-pedidosya{
+            width: 30px;
+            height: 30px;
+            margin: 5px auto;
+            transition: all 0.3s ease;
+            cursor: pointer;
+
+            &:hover {
+                transform: scale(1.2);
+                filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+            }
+        }
+        .fa-whatsapp-square{
+            color: rgb(50, 173, 50);
+            font-size: 4rem;
+            position: fixed;
+            bottom: 30px;
+            right: 1px;
+            
+        }
+    }
+    .seccionFooterSeguinos{
+        margin-right: 20px;
+        .fa-instagram{
+        color: white;
+        font-size: 2rem;
+        margin: 5px auto;
+        transition: all 0.3s ease;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+        }
+        }
+        .paga{
+        .tituloPaga{
+            margin: 5px auto;
+            .parrafoPaga{
+                text-align: center;
+            }
+        }
+    }
+    }
+    
+    .logoFooter{
+        margin-right: 60px;
+        .imgLogoFooter{
+            width: 250px
+        }
+    }
+}
+
+@media (max-width: 728px) {
+  .hero_header {
+    height: auto;
+    padding-bottom: 40px;
+
+    .seccionNav {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 10px;
+
+      .imagenHeader {
+        .logo {
+          width: 90px;
+        }
+      }
+
+      .navegacion {
+        width: 100%;
+
+        .listaNav {
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 15px;
+
+          .linkNav {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+    .seccionTitulo {
+      margin-left: 0;
+      padding: 20px;
+      align-items: center;
+      text-align: center;
+      height: auto;
+
+      .tituloPrincipal {
+        font-size: 2rem;
+        line-height: 1.2;
+      }
+
+      .parrafoTitulo {
+        font-size: 0.95rem;
+      }
+
+      .linkMenu {
+        width: 120px;
+        padding: 10px 0;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+@media (max-width: 728px) {
+  .simple_header {
+
+    .seccionNav {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+
+      .imagenHeader {
+        margin-left: 0;
+
+        .logo {
+          width: 90px;
+        }
+      }
+
+      .navegacion {
+        width: 100%;
+
+        .listaNav {
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 10px;
+
+          .linkNav {
+            margin: 0;
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+}
+@media (max-width: 728px) {
+
+  .mainIndex {
+    .tarjetaPanes {
+      padding: 40px 15px;
+
+      .tituloPanes {
+        font-size: 24px;
+      }
+
+      .contendorTarjetas {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .seccionTarjeta {
+        .imgTarjeta {
+          height: 220px;
+        }
+
+        .textoTarjeta {
+          font-size: 16px;
+          bottom: 15px;
+          left: 15px;
+        }
+      }
+    }
+
+    .SeccionSanguches {
+      padding: 30px 15px;
+      border-radius: 20px;
+
+      .tituloSanguches {
+        font-size: 1.4rem;
+
+        .pSanguches {
+          font-size: 1.2rem;
+        }
+      }
+
+      .lineaPanes {
+        width: 80px;
+      }
+
+      .contendorSanguches {
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+
+        .descripcionSanguches {
+          width: 100%;
+          text-align: center;
+          align-items: center;
+          padding: 0;
+          margin-top: 0;
+        }
+
+        .seccionImgSanguche {
+          width: 100%;
+          height: 260px;
+
+          .ImgSanguche {
+            width: 100%;
+            height: 260px;
+          }
+        }
+        .descripcionSanguches2 {
+          width: 100%;
+          text-align: center;
+          align-items: center;
+          padding: 0;
+          margin-top: 0;
+          height: auto;
+        }
+      }
+    }
+    .SeccionCreadores {
+      margin-top: 50px;
+
+      .tituloCreadores {
+        font-size: 1.3rem;
+        padding: 15px;
+      }
+
+      .Creadores {
+        .ParrafoCreadores {
+          width: 90%;
+          font-size: 0.9rem;
+        }
+
+        .imagenFlotante {
+          width: 220px;
+          height: 220px;
+        }
+      }
+    }
+
+  }
+}
+@media (max-width: 728px) {
+
+  .mainMenu {
+
+    .tituloMenu {
+      margin: 40px 0;
+      font-size: 1.5rem;
+      padding: 0 10px;
+    }
+
+    .menu {
+      padding: 0 10px;
+
+      .grid-menu {
+        grid-template-columns: 1fr;
+        grid-auto-rows: 220px;
+        gap: 12px;
+
+        .card {
+
+          img {
+            height: 100%;
+          }
+
+          .info {
+            bottom: 15px;
+            left: 15px;
+            font-size: 0.9rem;
+          }
+        }
+        .grande,
+        .alta {
+          grid-row: span 1;
+        }
+      }
+    }
+  }
+
+}
+@media (max-width: 728px) {
+
+  .formulario {
+    width: 90%;
+    max-width: 100%;
+    padding: 0 10px;
+    gap: 12px;
+  }
+
+  .tituloFormularios {
+    margin-top: 30px;
+    margin-bottom: 40px;
+    font-size: 1.5rem;
+    padding: 0 10px;
+  }
+
+  .campo {
+    width: 100%;
+  }
+
+  label {
+    font-size: 0.9rem;
+  }
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 12px;
+  }
+
+  textarea {
+    min-height: 120px;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+  }
+
+}
+@media (max-width: 728px) {
+
+  .footer {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    padding: 40px 20px;
+    gap: 35px;
+    text-align: center;
+
+    /* BLOQUE SUPERIOR */
+    .seccionFooter {
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+
+      .navegacionFooter {
+        margin-bottom: 0;
+        padding: 10px;
+
+        .DondeIr {
+          font-size: 0.9rem;
+          letter-spacing: 2px;
+        }
+
+        .listaNavFooter {
+          li {
+            margin-bottom: 8px;
+
+            a {
+              font-size: 0.9rem;
+            }
+          }
+        }
+      }
+    }
+
+    /* PEDIDOS */
+    .seccionFooterPedinos {
+      padding: 10px;
+      gap: 10px;
+
+      div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 0.8rem;
+      }
+
+      .fa-whatsapp,
+      .icon-pedidosya {
+        font-size: 1.8rem;
+      }
+
+      .icon-pedidosya {
+        width: 28px;
+        height: 28px;
+      }
+
+      /* BOTON FLOTANTE */
+      .fa-whatsapp-square {
+        font-size: 3rem;
+        bottom: 20px;
+        right: 10px;
+      }
+    }
+
+    /* LOGO CENTRAL (PROTAGONISTA) */
+    .logoFooter {
+      margin: 0;
+
+      .imgLogoFooter {
+        width: 180px;
+      }
+    }
+
+    /* SEGUINOS */
+    .seccionFooterSeguinos {
+      margin-right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+
+      h4 {
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+      }
+
+      .fa-instagram {
+        font-size: 1.8rem;
+      }
+
+      .paga {
+        text-align: center;
+
+        .tituloPaga {
+          font-size: 0.8rem;
+        }
+
+        .parrafoPaga {
+          font-size: 0.75rem;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+
+}
