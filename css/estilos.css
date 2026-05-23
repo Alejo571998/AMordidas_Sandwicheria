@@ -893,21 +893,16 @@ body{
     color:#8e8e8e;
 }
 
-.formulario button{
-
+.button{
     margin-top:10px;
-
     border:none;
-
     padding:18px;
-
+    text-align:center;
+    text-decoration:none;
     border-radius:999px;
-
     font-weight:800;
     font-size:1rem;
-
     cursor:pointer;
-
     color:black;
 
     background:
@@ -916,17 +911,16 @@ body{
         #d8a15d,
         #f3c98b
     );
-
     transition:.35s ease;
 }
-
-.formulario button:hover{
-
+.button:hover{
     transform:translateY(-5px);
-
     box-shadow:
     0 15px 35px rgba(216,161,93,.25);
+    color:rgb(181, 137, 35);
 }
+
+
 
 @media(min-width:768px){
 
@@ -939,20 +933,12 @@ body{
     }
 
 }
-/* =========================
-   MENU PAGE
-========================= */
-
 .mainMenu{
     min-height:100vh;
     background:#080808;
 
     padding-top:140px;
 }
-
-/* =========================
-   HERO
-========================= */
 
 .heroMenu{
     text-align:center;
@@ -1006,10 +992,6 @@ body{
     line-height:1.8;
 }
 
-/* =========================
-   GRID SECTION
-========================= */
-
 .menuSection{
 
     width:90%;
@@ -1029,10 +1011,6 @@ body{
 
     gap:25px;
 }
-
-/* =========================
-   CARD
-========================= */
 
 .cardMenu{
 
@@ -1073,10 +1051,6 @@ body{
     transform:scale(1.08);
 }
 
-/* =========================
-   OVERLAY
-========================= */
-
 .overlay{
 
     position:absolute;
@@ -1091,10 +1065,6 @@ body{
         transparent
     );
 }
-
-/* =========================
-   INFO
-========================= */
 
 .info{
 
@@ -1150,10 +1120,6 @@ body{
     line-height:1.6;
 }
 
-/* =========================
-   TABLET
-========================= */
-
 @media(min-width:768px){
 
     .tituloMenu{
@@ -1177,10 +1143,6 @@ body{
     }
 
 }
-
-/* =========================
-   DESKTOP
-========================= */
 
 @media(min-width:1200px){
 
