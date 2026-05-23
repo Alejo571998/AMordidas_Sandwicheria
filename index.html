@@ -6,34 +6,41 @@
         <title>A mordidas - Sandwicheria de especialidad</title>
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
         <script src="https://kit.fontawesome.com/53f4a08901.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="./css/bootstrap.min.css">
         <link rel="stylesheet" href="./css/estilos.css">
     </head>
     <body>
         <header class="hero_header">
-                <section class="seccionNav">
-                    <a class="imagenHeader" href="#">
-                    <img class="logo" src="./assets/img/LOGO A MORDIDAS defa.png" alt="Logo sandwicheria">
+            <nav class="navbar navbar-expand-lg navbar-light bgNav ">
+                <div class="container-fluid ">
+                    <a class="navbar-brand" href="#">
+                        <img class="logo" src="./assets/img/mordidasBlanco.png" alt="Logo sandwicheria" width="120px">
                     </a>
-                    <div class="hamburguesa">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                    <nav class="navegacion">
-                        <ul class="listaNav">
-                            <li class="listaItem"><a class="linkNav" href="#">Inicio</a></li>
-                            <li class="listaItem"><a class="linkNav" href="./pages/nuestro menu.html">Nuestro menu</a></li>
-                            <li class="listaItem"><a class="linkNav" href="./pages/contacto.html">Contacto</a></li>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0 bgNav w-100 justify-content-center">
+                            <li class="nav-item">
+                                <a class="nav-link colorNav" aria-current="page" href="#">Inicio</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link colorNav" href="./pages/nuestro menu.html">Nuestro menu</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link colorNav" href="./pages/contacto.html">Contacto</a>
+                            </li>
                         </ul>
-                    </nav>
-                </section>
-                <section class="seccionTitulo">
+                    </div>
+                </div>
+            </nav>
+            <section class="seccionTitulo d-none d-md-block">
                     <H1 class="tituloPrincipal">Sandwiches que.. <br> VALEN LA PENA</H1>
-                    <p class="parrafoTitulo">Un espacio donde lo artesanal se convierte en sabor</p>
+                    <p class="parrafoTitulo h4">Un espacio donde lo artesanal se convierte en sabor</p>
                     <a class="linkMenu" href="./pages/nuestro menu.html">Menu</a>
             </section>
         </header>
-        <main class="mainIndex">
+        <main class="mainIndex container">
             <section class="tarjetaPanes">
                 <h2 class="tituloPanes">¿QUE PANES USAMOS?</h2>
                 <hr class="lineaPanes">
@@ -112,7 +119,7 @@
                 </section>
             </section>
         </main>
-        <footer class="footer">
+        <footer class="footer container-fluid">
             <section class="seccionFooter">
                 <nav class="navegacionFooter">
                     <H4 class="DondeIr">¿DONDE IR?</H4>
@@ -151,5 +158,6 @@
                     </div>
             </section>
         </footer>
+    <script src="./js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

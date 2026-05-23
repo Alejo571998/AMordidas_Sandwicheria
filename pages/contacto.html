@@ -6,82 +6,217 @@
         <title>Contacto - A mordidas - Sandwicheria de especialidad</title>
         <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
         <script src="https://kit.fontawesome.com/53f4a08901.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="../css/bootstrap.min.css">
         <link rel="stylesheet" href="../css/estilos.css">
     </head>
     <body>
-        <header class="simple_header">
-           <section class="seccionNav">
-                    <a class="imagenHeader" href="../index.html">
-                    <img class="logo" src="../assets/img/mordidasBlanco.png" alt="Logo sandwicheria">
-                    </a>
-                    <nav class="navegacion">
-                        <ul class="listaNav">
-                            <li class="listaItem"><a class="linkNav" href="../index.html">Inicio</a></li>
-                            <li class="listaItem"><a class="linkNav" href="./nuestro menu.html">Nuestro menu</a></li>
-                            <li class="listaItem"><a class="linkNav" href="#">Contacto</a></li>
-                        </ul>
-                    </nav>
+        <header class="headerContacto">
+
+    <nav class="navbarCustom">
+
+        <a class="navbarBrand" href="../index.html">
+
+            <img
+            class="logo"
+            src="../assets/img/mordidasBlanco.png"
+            alt="Logo sandwicheria">
+
+        </a>
+
+        <ul class="navLinks">
+
+            <li>
+                <a class="colorNav" href="../index.html">
+                    Inicio
+                </a>
+            </li>
+
+            <li>
+                <a
+                class="colorNav"
+                href="./nuestro menu.html">
+
+                    Nuestro menú
+
+                </a>
+            </li>
+
+            <li>
+                <a
+                class="colorNav activeNav"
+                href="#">
+
+                    Contacto
+
+                </a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+</header>
+        <main class="mainContacto">
+
+            <section class="heroContacto">
+
+                <p class="subtituloContacto">
+                    CONTACTO
+                </p>
+
+                <h1 class="tituloContacto">
+                    Queremos conocer tu propuesta
+                </h1>
+
+                <p class="descripcionContacto">
+                    Ya sea para trabajar con nosotros,
+                    dejarnos una reseña o simplemente
+                    compartir una idea.
+                </p>
+
             </section>
-        </header>
-        <main>
-            <section class="contacto">
-                <h2 class="tituloFormularios">Trabajá con nosotros</h2>
-                <form class="formulario">
-                    <div class="campo">
-                        <label for="nombre">Nombre</label>
-                        <input type="text" id="nombre" placeholder="Tu nombre" required>
+
+            <section class="contenedorForms">
+
+                <!-- FORM TRABAJO -->
+
+                <section class="cardFormulario">
+
+                    <div class="tituloCard">
+                        <span class="linea"></span>
+                        <h2>Trabajá con nosotros</h2>
                     </div>
-                    <div class="campo">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" placeholder="tuemail@gmail.com" required>
-                    </div>
-                    <div class="campo">
-                        <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" placeholder="Tu teléfono">
-                    </div>
-                    <div class="campo">
-                        <label for="mensaje">Contanos sobre tu propuesta</label>
-                        <textarea id="mensaje" rows="5" placeholder="Escribí tu mensaje..." required></textarea>
-                    </div>
-                    <button type="submit">Enviar mensaje</button>
-                </form>
-            </section>
-            <section class="reseñas">
-                <h2  class="tituloFormularios">Dejanos tu reseña</h2>
-                <form class="formulario">
-                    <div class="campo">
-                        <label for="cliente">Nombre</label>
-                        <input type="text" id="cliente" placeholder="Tu nombre" required>
-                    </div>
+
+                    <form class="formulario">
+
                         <div class="campo">
-                        <label for="producto">Producto que probaste</label>
-                        <select id="producto">
-                        <option>Brunchwich</option>
-                        <option>Crudo</option>
-                        <option>Capresse</option>
-                        <option>Milandwich Carne</option>
-                        <option>Milandwich Pollo</option>
-                        <option>Classic</option>
-                        <option>Elderretido</option>
-                        </select>
+                            <label for="nombre">Nombre</label>
+                            <input
+                            type="text"
+                            id="nombre"
+                            placeholder="Tu nombre"
+                            required>
+                        </div>
+
+                        <div class="campo">
+                            <label for="email">Email</label>
+                            <input
+                            type="email"
+                            id="email"
+                            placeholder="tuemail@gmail.com"
+                            required>
+                        </div>
+
+                        <div class="campo">
+                            <label for="telefono">Teléfono</label>
+                            <input
+                            type="tel"
+                            id="telefono"
+                            placeholder="Tu teléfono">
+                        </div>
+
+                        <div class="campo">
+                            <label for="mensaje">
+                                Contanos sobre tu propuesta
+                            </label>
+
+                            <textarea
+                            id="mensaje"
+                            rows="5"
+                            placeholder="Escribí tu mensaje..."
+                            required></textarea>
+                        </div>
+
+                        <button type="submit">
+                            Enviar mensaje
+                        </button>
+
+                    </form>
+
+                </section>
+
+                <!-- FORM RESEÑA -->
+
+                <section class="cardFormulario">
+
+                    <div class="tituloCard">
+                        <span class="linea"></span>
+                        <h2>Dejanos tu reseña</h2>
                     </div>
-                    <div class="campo">
-                        <label for="rating">Calificación</label>
-                        <select id="rating">
-                        <option>⭐</option>
-                        <option>⭐⭐</option>
-                        <option>⭐⭐⭐</option>
-                        <option>⭐⭐⭐⭐</option>
-                        <option>⭐⭐⭐⭐⭐</option>
-                        </select>
-                    </div>
-                    <div class="campo">
-                        <label for="comentario">Tu opinión</label>
-                        <textarea id="comentario" rows="4" placeholder="Contanos qué te pareció"></textarea>
-                    </div>
-                    <button type="submit">Enviar reseña</button>
-                </form>
+
+                    <form class="formulario">
+
+                        <div class="campo">
+                            <label for="cliente">Nombre</label>
+
+                            <input
+                            type="text"
+                            id="cliente"
+                            placeholder="Tu nombre"
+                            required>
+                        </div>
+
+                        <div class="campo">
+
+                            <label for="producto">
+                                Producto que probaste
+                            </label>
+
+                            <select id="producto">
+
+                                <option>Brunchwich</option>
+                                <option>Crudo</option>
+                                <option>Capresse</option>
+                                <option>Milandwich Carne</option>
+                                <option>Milandwich Pollo</option>
+                                <option>Classic</option>
+                                <option>Elderretido</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="campo">
+
+                            <label for="rating">
+                                Calificación
+                            </label>
+
+                            <select id="rating">
+
+                                <option>⭐</option>
+                                <option>⭐⭐</option>
+                                <option>⭐⭐⭐</option>
+                                <option>⭐⭐⭐⭐</option>
+                                <option>⭐⭐⭐⭐⭐</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="campo">
+
+                            <label for="comentario">
+                                Tu opinión
+                            </label>
+
+                            <textarea
+                            id="comentario"
+                            rows="4"
+                            placeholder="Contanos qué te pareció"></textarea>
+
+                        </div>
+
+                        <button type="submit">
+                            Enviar reseña
+                        </button>
+
+                    </form>
+
+                </section>
+
             </section>
+
         </main>
         <footer class="footer">
             <section class="seccionFooter">
@@ -122,5 +257,6 @@
                     </div>
             </section>
         </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

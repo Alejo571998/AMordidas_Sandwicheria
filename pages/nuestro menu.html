@@ -6,86 +6,277 @@
         <title>Nuestro Menu - A mordidas - Sandwicheria de especialidad</title>
         <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
         <script src="https://kit.fontawesome.com/53f4a08901.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="../css/bootstrap.min.css">
         <link rel="stylesheet" href="../css/estilos.css">
     </head>
     <body>
-        <header class="simple_header">
-            <section class="seccionNav">
-                    <a class="imagenHeader" href="../index.html">
-                    <img class="logo" src="../assets/img/mordidasBlanco.png" alt="Logo sandwicheria">
-                    </a>
-                    <nav class="navegacion">
-                        <ul class="listaNav">
-                            <li class="listaItem"><a class="linkNav" href="../index.html">Inicio</a></li>
-                            <li class="listaItem"><a class="linkNav" href="#">Nuestro menu</a></li>
-                            <li class="listaItem"><a class="linkNav" href="./contacto.html">Contacto</a></li>
-                        </ul>
-                    </nav>
-            </section>
+        <header class="headerMenu">
+
+            <nav class="navbarCustom">
+
+                <a class="navbarBrand" href="../index.html">
+
+                    <img
+                    class="logo"
+                    src="../assets/img/mordidasBlanco.png"
+                    alt="Logo sandwicheria">
+
+                </a>
+
+                <ul class="navLinks">
+
+                    <li>
+                        <a
+                        class="colorNav"
+                        href="../index.html">
+
+                            Inicio
+
+                        </a>
+                    </li>
+
+                    <li>
+                        <a
+                        class="colorNav activeNav"
+                        href="#">
+
+                            Nuestro menú
+
+                        </a>
+                    </li>
+
+                    <li>
+                        <a
+                        class="colorNav"
+                        href="./contacto.html">
+
+                            Contacto
+
+                        </a>
+                    </li>
+
+                </ul>
+
+            </nav>
+
         </header>
         <main class="mainMenu">
-            <section class="tituloMenu">
-                <h1>NUESTRO MENU</h1>
+
+            <section class="heroMenu">
+
+                <p class="subtituloMenu">
+                    A MORDIDAS
+                </p>
+
+                <h1 class="tituloMenu">
+                    Nuestro menú
+                </h1>
+
+                <p class="descripcionMenu">
+
+                    Sanguches gourmet pensados
+                    para disfrutarse sin apuro.
+
+                </p>
+
             </section>
-            <section class="menu">
+
+            <section class="menuSection">
+
                 <div class="grid-menu">
-                    <div class="card grande">
-                        <img src="../assets/img/brunchwich.jpeg" alt="Brunchwich">
-                        <div class="info">
-                            <h3 class="tituloProducto">Brunchwich</h3>
-                            <p>Potencia y sabor.</p>
-                        </div>
-                    </div>
 
-                    <div class="card alta">
-                        <img src="../assets/img/crudo.jpeg" alt="Crudo">
-                        <div class="info">
-                            <h3 class="tituloProducto">Crudo</h3>
-                            <p>La armonia de lo tradicional.</p>
-                        </div>
-                    </div>
+                    <!-- CARD -->
 
-                    <div class="card grande">
-                        <img src="../assets/img/capresse.png" alt="Capresse">
-                        <div class="info">
-                            <h3 class="tituloProducto">Capresse</h3>
-                            <p>La delicia dentro de un Bagel.</p>
-                        </div>
-                    </div>
+                    <article class="cardMenu grande">
 
-                    <div class="card">
-                        <img src="../assets/img/milandwichcarne.jpeg" alt="Milandwich_Carne">
-                        <div class="info">
-                        <h3 class="tituloProducto">Milandwich Carne</h3>
-                            <p>El equilibrio perfecto entre lo tradicional y lo sofisticado.</p>
-                            </div>
-                        </div>
-                    
-                    <div class="card alta">
-                        <img src="../assets/img/milandwichpollo.jpeg" alt="Milandwich_Pollo">
-                        <div class="info">
-                            <h3 class="tituloProducto">Milandwich Pollo</h3>
-                            <p>Sabor intenso y actitud fuerte.</p>
-                        </div>
-                    </div>
+                        <img
+                        src="../assets/img/brunchwich.jpeg"
+                        alt="Brunchwich">
 
-                    <div class="card grande">
-                        <img src="../assets/img/classic.jpeg" alt="Classic">
+                        <div class="overlay"></div>
+
                         <div class="info">
-                            <h3 class="tituloProducto">Classic</h3>
-                            <p>No hay nada mas moderno que lo clasico.</p>
+
+                            <span class="categoria">
+                                Favorito
+                            </span>
+
+                            <h3 class="tituloProducto">
+                                Brunchwich
+                            </h3>
+
+                            <p>
+                                Potencia y sabor.
+                            </p>
+
                         </div>
-                    </div>
-                    <div class="card">
-                        <img src="../assets/img/elderretido.jpeg" alt="Elderretido">
+
+                    </article>
+
+
+                    <article class="cardMenu alta">
+
+                        <img
+                        src="../assets/img/crudo.jpeg"
+                        alt="Crudo">
+
+                        <div class="overlay"></div>
+
                         <div class="info">
-                            <h3 class="tituloProducto">Elderretido</h3>
-                            <p>Una explosion de sabor y queso.</p>
-                            </div>
+
+                            <span class="categoria">
+                                Tradicional
+                            </span>
+
+                            <h3 class="tituloProducto">
+                                Crudo
+                            </h3>
+
+                            <p>
+                                La armonía de lo tradicional.
+                            </p>
+
                         </div>
-                    </div>
+
+                    </article>
+
+
+                    <article class="cardMenu grande">
+
+                        <img
+                        src="../assets/img/capresse.png"
+                        alt="Capresse">
+
+                        <div class="overlay"></div>
+
+                        <div class="info">
+
+                            <span class="categoria">
+                                Bagel
+                            </span>
+
+                            <h3 class="tituloProducto">
+                                Capresse
+                            </h3>
+
+                            <p>
+                                La delicia dentro de un Bagel.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                    <article class="cardMenu">
+
+                        <img
+                        src="../assets/img/milandwichcarne.jpeg"
+                        alt="Milandwich Carne">
+
+                        <div class="overlay"></div>
+
+                        <div class="info">
+
+                            <span class="categoria">
+                                Premium
+                            </span>
+
+                            <h3 class="tituloProducto">
+                                Milandwich Carne
+                            </h3>
+
+                            <p>
+                                Tradición y sofisticación.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="cardMenu alta">
+
+                        <img
+                        src="../assets/img/milandwichpollo.jpeg"
+                        alt="Milandwich Pollo">
+
+                        <div class="overlay"></div>
+
+                        <div class="info">
+
+                            <span class="categoria">
+                                Intenso
+                            </span>
+
+                            <h3 class="tituloProducto">
+                                Milandwich Pollo
+                            </h3>
+
+                            <p>
+                                Sabor intenso y actitud fuerte.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="cardMenu grande">
+
+                        <img
+                        src="../assets/img/classic.jpeg"
+                        alt="Classic">
+
+                        <div class="overlay"></div>
+
+                        <div class="info">
+
+                            <span class="categoria">
+                                Clásico
+                            </span>
+
+                            <h3 class="tituloProducto">
+                                Classic
+                            </h3>
+
+                            <p>
+                                Nunca pasa de moda.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                    <article class="cardMenu">
+
+                        <img
+                        src="../assets/img/elderretido.jpeg"
+                        alt="Elderretido">
+
+                        <div class="overlay"></div>
+
+                        <div class="info">
+
+                            <span class="categoria">
+                                Queso Lovers
+                            </span>
+
+                            <h3 class="tituloProducto">
+                                Elderretido
+                            </h3>
+
+                            <p>
+                                Explosión de queso y sabor.
+                            </p>
+
+                        </div>
+
+                    </article>
+
                 </div>
+
             </section>
+
         </main>
         <footer class="footer">
             <section class="seccionFooter">
@@ -125,5 +316,7 @@
                         <p class="parrafoPaga">Tarjeta de debito, credito,<br>efectivo o Mercado Pago.</p>
                     </div>
             </section>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
