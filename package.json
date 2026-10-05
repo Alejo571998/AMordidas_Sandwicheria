@@ -1,0 +1,34 @@
+{
+  "name": "a-mordidas-deli-house",
+  "version": "2.0.0",
+  "private": true,
+  "description": "A Mordidas — Deli House. Sanguchería artesanal en Santa Fe. Menú interactivo y pedidos por WhatsApp.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "product-image": "node scripts/product-image.mjs"
+  },
+  "dependencies": {
+    "next": "16.3.8",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.8",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^4",
+    "sharp": "^0.35.5"
+  }
+}
