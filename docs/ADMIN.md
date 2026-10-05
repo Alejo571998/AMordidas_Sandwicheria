@@ -1,30 +1,103 @@
 # Administrar la carta y los datos del negocio
 
-Todo lo que cambia seguido está en **dos archivos**. No hace falta tocar componentes.
+Hay dos formas de cambiar la carta:
 
 | Qué querés cambiar | Dónde |
 | --- | --- |
-| Precios, productos, fotos, agotados, destacados | `src/data/products.ts` |
+| **Precio, "agotado por hoy", mostrar u ocultar un producto** | Panel **/admin** (cuando esté conectado) o `src/data/products.ts` |
+| Nombres, descripciones, ingredientes, fotos, productos nuevos | `src/data/products.ts` |
 | Categorías (Sanguches, Hamburguesas…) | `src/data/categories.ts` |
-| WhatsApp, Instagram, PedidosYa, horarios, zona de envío, medios de pago, dirección | `src/config/site.ts` |
-
-Después de editar: guardar, hacer commit y push. Vercel publica solo en ~1 minuto.
-Si un dato está mal cargado (ej: precio con coma, id repetido), **el build falla con un mensaje en castellano** que dice qué producto revisar: la web publicada nunca queda rota.
+| WhatsApp, Instagram, PedidosYa, horarios, zona de envío, medios de pago, dirección de retiro | `src/config/site.ts` |
 
 ---
 
-## Productos (`src/data/products.ts`)
+## Panel de administrador (/admin)
+
+Página privada para que el dueño cambie, desde el celular y sin tocar código:
+
+- **Precio** de cada producto (vacío = "Precio a confirmar").
+- **Hay stock hoy**: apagado muestra "Por hoy se fue de vacaciones 😴" y no se puede pedir.
+- **Se muestra en la carta**: apagado lo oculta de la web.
+
+Los cambios se ven en la web apenas se guardan.
+
+**Estado actual: APAGADO.** Falta conectar Supabase (pasos abajo). Mientras tanto, la web usa los precios de `src/data/products.ts` y `/admin` muestra "El panel todavía no está activo".
+
+### Cómo se protege
+
+- Entra solo quien tenga **usuario y contraseña** creados en Supabase **y** figure en la tabla `admins`. Una cuenta que no esté en esa tabla no puede cambiar nada, aunque logre entrar.
+- La base vuelve a verificar cada cambio con **RLS** (Row Level Security): aunque alguien llamara a la API directamente, sin ser admin no puede escribir.
+- Las cookies de sesión solo viajan a `/admin`, no se pueden leer con JavaScript y exigen HTTPS.
+- La web usa solo la **clave publicable**. La clave secreta (`service_role` / `sb_secret_…`) **no se usa ni se carga en ningún lado**. Si alguien la pega por error, el sitio se niega a arrancar.
+- `/admin` no aparece en Google (`noindex` + `robots.txt`).
+
+### Activarlo (una sola vez, ~15 minutos)
+
+**1. Crear el proyecto en Supabase** (con la cuenta que se vaya a usar)
+
+- [supabase.com](https://supabase.com) → *New project*. Nombre: `a-mordidas`. Región: **South America (São Paulo)**. Plan gratis.
+- Guardá la contraseña de la base en un lugar seguro (no se carga en la web).
+
+**2. Crear las tablas**
+
+- En el proyecto: *SQL Editor* → *New query* → pegá todo el contenido de [`supabase/schema.sql`](../supabase/schema.sql) → *Run*.
+
+**3. Cerrar el registro y crear la cuenta del dueño**
+
+- *Authentication* → *Sign In / Providers* → *Email*: dejá activado Email, **desactivá "Allow new users to sign up"** y guardá.
+- *Authentication* → *Users* → *Add user* → *Create new user*: email del dueño y una contraseña larga. Tildá **Auto Confirm User**.
+
+**4. Darle permiso de administrador**
+
+- *SQL Editor* → nueva consulta (reemplazá el email):
+
+  ```sql
+  insert into public.admins (user_id)
+  select id from auth.users where email = 'email-del-dueno@ejemplo.com';
+  ```
+
+**5. Conectar la web (Vercel)**
+
+- En Supabase: *Project Settings* → *API Keys*: copiá la **Publishable key** (`sb_publishable_…`). En *Data API* (o *Connect*), copiá la **Project URL**.
+- En Vercel: proyecto `a-mordidas-sandwicheria` → *Settings* → *Environment Variables* → agregá (para *Production* y *Preview*):
+
+  | Nombre | Valor |
+  | --- | --- |
+  | `NEXT_PUBLIC_SUPABASE_URL` | la Project URL (`https://xxxx.supabase.co`) |
+  | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | la Publishable key |
+  | `CRON_SECRET` | una frase larga al azar (protege la tarea diaria) |
+
+- *Deployments* → último deploy → *Redeploy*.
+
+**6. Probar**
+
+- Entrá a `https://a-mordidas-sandwicheria.vercel.app/admin`, iniciá sesión, cambiá un precio y guardá. Abrí la web en otra pestaña: tiene que verse el precio nuevo.
+
+### Bueno saber
+
+- **Primer guardado:** mientras un producto no se haya guardado nunca desde el panel, usa el valor de `products.ts`. Después de guardarlo, manda lo del panel.
+- **Supabase gratis se pausa** si pasa una semana sin uso. Para evitarlo, Vercel corre todos los días una tarea (`/api/keepalive`, configurada en `vercel.json`) que hace una consulta liviana. Si igual se pausara: en Supabase, *Restore project*.
+- **Si la base no responde**, la web sigue mostrando la última versión buena (no vuelve a precios viejos). Un deploy nuevo con la base caída falla a propósito, con un mensaje claro, y Vercel deja publicada la versión anterior.
+- **Cambiar la contraseña del dueño:** Supabase → *Authentication* → *Users* → el usuario → *Send password recovery* o *Reset password*.
+- **Sumar otra persona:** crear su usuario (paso 3) y agregarla a `admins` (paso 4). Para quitarle el acceso: `delete from public.admins where user_id = '…';`.
+
+---
+
+## Editar la carta en el código (`src/data/products.ts`)
+
+Después de editar: guardar, hacer commit y push. Vercel publica solo en ~1 minuto.
+Si un dato está mal cargado (ej: precio con coma, id repetido), **el build falla con un mensaje en castellano** que dice qué producto revisar: la web publicada nunca queda rota.
 
 Cada producto es un bloque así:
 
 ```ts
 {
-  id: "milandwich-pollo",            // no cambiar una vez publicado (lo usa el carrito guardado)
+  id: "milandwich-pollo",            // no cambiar una vez publicado (lo usan el carrito y el panel)
   name: "Milandwich Pollo",
   category: "sanguches",             // "sanguches" | "hamburguesas"
   description: "Milanesa de pollo crocante y bien cargado. El que nunca falla.",
   ingredients: ["Pan de lomo gratinado", "Mostanesa", "Milanesa de pollo", "Queso sardo", "Rúcula", "Tomate"],
-  price: null,                       // ← poné el precio en pesos SIN puntos: 12500
+  price: 10400,                      // pesos SIN puntos. null = "Precio a confirmar"
   image: { src: milandwichPolloImg, alt: "Descripción de la foto" },
   available: true,                   // false = "Por hoy se fue de vacaciones 😴" (no se puede agregar)
   active: true,                      // false = no aparece en la carta
@@ -36,12 +109,11 @@ Cada producto es un bloque así:
 }
 ```
 
+> Con el panel conectado, `price`, `available` y `active` de este archivo son solo el valor inicial: lo que se guarde en el panel tiene prioridad.
+
 ### Tareas comunes
 
-- **Cargar o cambiar un precio:** `price: 12500`. Con `null` la web muestra "Precio a confirmar" y el total del pedido se confirma por WhatsApp. Cuando todos los productos del pedido tienen precio, el total se calcula solo.
-- **Marcar agotado por hoy:** `available: false`. Volver a `true` cuando haya.
-- **Sacar de la carta:** `active: false` (Brunchwich y Capresse están así porque no figuran en el feed de septiembre).
-- **Producto nuevo:** copiá un bloque, cambiá `id` (minúsculas con guiones), nombre, ingredientes y foto.
+- **Producto nuevo:** copiá un bloque, cambiá `id` (minúsculas con guiones), nombre, ingredientes y foto. Aparece solo en el panel.
 - **Foto nueva:**
   1. Recortá el producto sin fondo (Photoroom, remove.bg) y guardalo como PNG.
   2. `npm run product-image -- "ruta/al/recorte.png" id-del-producto`
@@ -52,24 +124,10 @@ Cada producto es un bloque así:
 
 - `whatsapp.number`: formato internacional sin `+` ni espacios (`549` + característica + número). Es el número al que llegan los pedidos.
 - `hours.ranges`: horarios de todos los días. Si el cierre es menor que la apertura (19:00 → 00:30) se entiende que cierra al día siguiente. El cartel "Abierto ahora / Cerrado" se calcula solo, en hora de Santa Fe.
-- `location.streetAddress`: si cargás la dirección de retiro, aparece en el footer y en Google (datos estructurados).
+- `location.streetAddress`: dirección de retiro. Aparece en el footer (con link a Google Maps), en el pedido y en Google (datos estructurados).
 - `paymentMethods`, `delivery.area`, `pedidosYa`, `instagram`.
 
 ## Medición (analytics)
 
 `src/lib/analytics.ts` ya emite estos eventos: `menu_view`, `product_view`, `add_to_cart`, `remove_from_cart`, `checkout_start`, `whatsapp_order_click`.
 Para medirlos, instalá Google Tag Manager (los eventos van a `window.dataLayer`) o agregá la llamada de la plataforma dentro de `track()`. No hay que tocar componentes.
-
----
-
-## Pasar a Supabase (cuando haga falta un panel)
-
-Hoy no hace falta: la carta cambia poco y editar un archivo es más simple, gratis y sin riesgos de seguridad.
-Conviene migrar si quieren cambiar precios o agotados **desde el celular sin tocar código**.
-
-1. Crear proyecto en Supabase y ejecutar `supabase/schema.sql` (tablas + RLS + permisos de admin).
-2. Subir las fotos al bucket `products` (Storage, público) y cargar los productos.
-3. Variables en Vercel: `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` (la anon key es pública y está protegida por RLS). **Nunca** usar la `service_role` key en el frontend.
-4. Cambiar solo `getMenu()` en `src/lib/catalog.ts` para leer de Supabase. La validación del catálogo y toda la UI siguen igual.
-5. Para que los cambios se vean sin redeploy: revalidación por tiempo o `revalidateTag` desde el panel.
-6. El panel (`/admin`, con login de Supabase Auth) solo necesita listar productos y editar `price`, `available`, `active`, `badge`.

@@ -3,6 +3,7 @@ import { OrderButton } from "@/components/cart/OrderButton";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { siteConfig } from "@/config/site";
+import { pickupMapsUrl } from "@/lib/location";
 import { buildWhatsAppUrl, contactMessages } from "@/lib/whatsapp";
 import { OpenStatus } from "./OpenStatus";
 
@@ -24,6 +25,7 @@ const invitationClass =
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const mapsUrl = pickupMapsUrl();
   return (
     <footer id="contacto" aria-labelledby="contacto-title" className="focus-on-dark relative mt-6 bg-olive-950 bg-grain text-cream">
       <Brush name="torn" className="absolute -top-[22px] left-0 h-6 w-full text-olive-950" />
@@ -65,9 +67,21 @@ export function Footer() {
               </p>
               <p className="flex items-start gap-2">
                 <Icon name="pin" size={18} className="mt-1 shrink-0 text-mustard" />
-                {siteConfig.location.streetAddress
-                  ? `Retiro en ${siteConfig.location.streetAddress}.`
-                  : "Retiro: coordinamos el punto por WhatsApp."}
+                <span>
+                  {siteConfig.location.streetAddress
+                    ? `Retiro en ${siteConfig.location.streetAddress}, ${siteConfig.location.city}.`
+                    : "Retiro: coordinamos el punto por WhatsApp."}
+                  {mapsUrl ? (
+                    <a
+                      href={mapsUrl}
+                      {...external}
+                      className="mt-1 flex min-h-11 w-fit items-center gap-1.5 font-semibold text-cream underline-offset-4 hover:text-mustard hover:underline"
+                    >
+                      Cómo llegar
+                      <Icon name="arrowRight" size={16} />
+                    </a>
+                  ) : null}
+                </span>
               </p>
             </InfoBlock>
 

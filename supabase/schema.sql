@@ -1,89 +1,99 @@
 -- =============================================================================
--- A MORDIDAS — Esquema para un futuro panel de administración (Supabase / Postgres)
+-- A MORDIDAS — Base del panel de administración (Supabase / Postgres)
 --
--- NO está conectado todavía. Hoy la carta vive en src/data/products.ts.
--- Este archivo deja lista la migración: ver docs/ADMIN.md → "Pasar a Supabase".
+-- Se ejecuta UNA vez en el SQL Editor del proyecto nuevo (ver docs/ADMIN.md).
+-- Se puede volver a ejecutar sin romper nada.
+--
+-- Qué guarda: solo lo que el dueño cambia desde /admin (precio, stock, visibilidad).
+-- Nombres, ingredientes y fotos siguen en src/data/products.ts.
 --
 -- Seguridad:
---   * RLS activado en todas las tablas.
---   * El sitio público (clave "anon") solo LEE productos activos.
---   * Solo los usuarios listados en public.admins pueden crear/editar/borrar.
---   * La service_role key NUNCA va al frontend ni a variables NEXT_PUBLIC_*.
+--   * RLS activado en las dos tablas.
+--   * Cualquiera puede LEER precios (son públicos: están en la web).
+--   * Solo las cuentas listadas en public.admins pueden cambiarlos.
+--   * La clave secreta (service_role / sb_secret_) NUNCA va en la web ni en Vercel.
 -- =============================================================================
 
-create table if not exists public.categories (
-  id          text primary key check (id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
-  label       text not null,
-  singular    text not null,
-  description text not null default '',
-  sort_order  int  not null default 0
+-- ---------------------------------------------------------------- Tablas
+create table if not exists public.product_settings (
+  product_id  text primary key check (product_id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
+  price       integer check (price is null or (price > 0 and price <= 1000000)),  -- pesos; null = "a confirmar"
+  available   boolean not null default true,   -- false = "Por hoy se fue de vacaciones"
+  active      boolean not null default true,   -- false = no aparece en la carta
+  updated_at  timestamptz not null default now(),
+  updated_by  uuid default auth.uid() references auth.users (id) on delete set null
 );
 
-create table if not exists public.products (
-  id          text primary key check (id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
-  name        text not null check (char_length(name) between 2 and 60),
-  category_id text not null references public.categories(id) on update cascade,
-  description text not null default '' check (char_length(description) <= 160),
-  ingredients text[] not null check (cardinality(ingredients) > 0),
-  price       integer check (price is null or price > 0),          -- pesos, null = "a confirmar"
-  image_url   text not null,                                         -- Supabase Storage (bucket "products")
-  image_alt   text not null check (char_length(image_alt) > 3),
-  available   boolean not null default true,                         -- false = agotado por hoy
-  active      boolean not null default true,                         -- false = fuera de carta
-  featured    boolean not null default false,
-  badge       text check (badge is null or char_length(badge) <= 16),
-  tags        text[] not null default '{}',
-  size        text,
-  sort_order  int not null default 0,
-  updated_at  timestamptz not null default now()
-);
-
-create index if not exists products_category_idx on public.products (category_id, sort_order);
-
--- Quién puede administrar (se agrega a mano desde el panel de Supabase).
+-- Quién puede administrar. Se agrega a mano (ver docs/ADMIN.md, paso 4).
 create table if not exists public.admins (
-  user_id uuid primary key references auth.users(id) on delete cascade
+  user_id    uuid primary key references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now()
 );
 
-create or replace function public.is_admin() returns boolean
-language sql stable security definer set search_path = public as $$
-  select exists (select 1 from public.admins where user_id = auth.uid());
+-- ---------------------------------------------------------------- Funciones
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (select 1 from public.admins where user_id = (select auth.uid()));
 $$;
 
-create or replace function public.touch_updated_at() returns trigger
-language plpgsql as $$
+revoke execute on function public.is_admin() from public, anon;
+grant execute on function public.is_admin() to authenticated;
+
+create or replace function public.touch_product_settings()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
 begin
   new.updated_at := now();
+  new.updated_by := (select auth.uid());
   return new;
 end;
 $$;
 
-drop trigger if exists products_touch on public.products;
-create trigger products_touch before update on public.products
-  for each row execute function public.touch_updated_at();
+drop trigger if exists product_settings_touch on public.product_settings;
+create trigger product_settings_touch
+  before update on public.product_settings
+  for each row execute function public.touch_product_settings();
 
 -- ---------------------------------------------------------------- RLS
-alter table public.categories enable row level security;
-alter table public.products   enable row level security;
-alter table public.admins     enable row level security;
+alter table public.product_settings enable row level security;
+alter table public.admins enable row level security;
 
--- Lectura pública
-create policy "categorias visibles" on public.categories
-  for select using (true);
-create policy "productos activos visibles" on public.products
-  for select using (active or public.is_admin());
+drop policy if exists "precios visibles para todos" on public.product_settings;
+create policy "precios visibles para todos" on public.product_settings
+  for select to anon, authenticated
+  using (true);
 
--- Escritura solo admins
-create policy "admins gestionan categorias" on public.categories
-  for all using (public.is_admin()) with check (public.is_admin());
-create policy "admins gestionan productos" on public.products
-  for all using (public.is_admin()) with check (public.is_admin());
-create policy "admins se ven a si mismos" on public.admins
-  for select using (user_id = auth.uid());
+drop policy if exists "admins crean precios" on public.product_settings;
+create policy "admins crean precios" on public.product_settings
+  for insert to authenticated
+  with check ((select public.is_admin()));
 
--- ---------------------------------------------------------------- Datos iniciales
-insert into public.categories (id, label, singular, description, sort_order) values
-  ('sanguches',    'Sanguches',    'Sanguche',    'En pan de lomo gratinado o pan de molde tostado.', 1),
-  ('hamburguesas', 'Hamburguesas', 'Hamburguesa', 'Medallones smash en pan gratinado.',               2)
-on conflict (id) do nothing;
--- Los productos se cargan desde src/data/products.ts (ver docs/ADMIN.md).
+drop policy if exists "admins cambian precios" on public.product_settings;
+create policy "admins cambian precios" on public.product_settings
+  for update to authenticated
+  using ((select public.is_admin()))
+  with check ((select public.is_admin()));
+
+-- Sin política de DELETE: nadie borra filas desde la web.
+
+drop policy if exists "cada admin se ve a sí mismo" on public.admins;
+create policy "cada admin se ve a sí mismo" on public.admins
+  for select to authenticated
+  using (user_id = (select auth.uid()));
+
+-- Sin políticas de escritura en admins: solo se edita desde el panel de Supabase.
+
+-- ---------------------------------------------------------------- Permisos
+revoke all on public.product_settings from anon, authenticated;
+grant select on public.product_settings to anon, authenticated;
+grant insert, update on public.product_settings to authenticated;
+
+revoke all on public.admins from anon, authenticated;
+grant select on public.admins to authenticated;

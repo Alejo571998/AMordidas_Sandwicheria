@@ -15,7 +15,14 @@ const fieldBase =
 
 const modes: Array<{ id: DeliveryMode; title: string; hint: string; icon: IconName }> = [
   { id: "envio", title: "Envío", hint: `A tu puerta, en ${siteConfig.delivery.area}`, icon: "scooter" },
-  { id: "retiro", title: "Retiro", hint: "Pasás a buscarlo, coordinamos por WhatsApp", icon: "walk" },
+  {
+    id: "retiro",
+    title: "Retiro",
+    hint: siteConfig.location.streetAddress
+      ? `Pasás a buscarlo por ${siteConfig.location.streetAddress}`
+      : "Pasás a buscarlo, coordinamos por WhatsApp",
+    icon: "walk",
+  },
 ];
 
 function FieldError({ id, message }: { id: string; message?: string }) {

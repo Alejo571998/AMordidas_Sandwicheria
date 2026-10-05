@@ -18,7 +18,7 @@ const tones = {
   hero: "bg-white/15 text-white lg:bg-charcoal/6 lg:text-charcoal",
 } as const;
 
-/** "Abierto ahora · hasta 17:30" / "Cerrado · abrimos 19:00". Se calcula en el navegador, en hora de Santa Fe. */
+/** "Abierto ahora · hasta 17:00" / "Cerrado · abrimos 19:00". Se calcula en el navegador, en hora de Santa Fe. */
 export function OpenStatus({ tone = "dark", className }: { tone?: keyof typeof tones; className?: string }) {
   const minute = useSyncExternalStore(subscribe, currentMinute, () => null);
   if (minute === null) return <span className={cn("inline-block h-7 w-44", className)} aria-hidden />;

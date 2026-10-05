@@ -19,7 +19,8 @@ const faqs: Array<{ q: string; a: ReactNode }> = [
     q: "¿Hacen delivery?",
     a: (
       <>
-        ¡Claro! Llevamos <span translate="no">A Mordidas</span> hasta tu puerta. O si preferís, podés pasar a retirarlo.
+        ¡Claro! Llevamos <span translate="no">A Mordidas</span> hasta tu puerta. O si preferís, podés pasar a retirarlo
+        {siteConfig.location.streetAddress ? ` por ${siteConfig.location.streetAddress}` : ""}.
       </>
     ),
   },

@@ -6,9 +6,9 @@ Sitio de la sanguchería A Mordidas (Santa Fe). Menú interactivo, carrito y ped
 
 ## Stack
 
-- Next.js 16 (App Router, todo estático) · React 19 · TypeScript · Tailwind CSS 4
-- Sin base de datos ni backend: la carta vive en `src/data/products.ts` (fuente única).
-- Deploy en Vercel (`vercel.json` fija el framework).
+- Next.js 16 (App Router, la web pública es estática) · React 19 · TypeScript · Tailwind CSS 4
+- La carta vive en `src/data/products.ts`. Precio, stock y visibilidad se pueden manejar desde el **panel `/admin`** (Supabase Auth + RLS), que queda apagado hasta cargar las variables de Supabase.
+- Deploy en Vercel (`vercel.json`: framework y tarea diaria `/api/keepalive`).
 
 ## Uso
 
@@ -24,32 +24,38 @@ npm run check        # lint + typecheck + tests + build
 | `npm run build` / `start` | Build y servidor de producción |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Tipos de rutas + TypeScript |
-| `npm test` | Tests unitarios (carrito, WhatsApp, horarios, catálogo) |
+| `npm test` | Tests unitarios (carrito, WhatsApp, horarios, catálogo, precios del panel) |
 | `npm run product-image -- <png> <id>` | Genera la foto de un producto con el estilo de la carta |
 
 ## Estructura
 
 ```
 src/
-  app/            layout (SEO, fuentes), página, 404, error, sitemap, robots, íconos, OG
+  app/
+    (site)/       web pública: layout (carrito, header, footer) y home
+    admin/        panel: login, precios y stock, acciones del servidor
+    api/keepalive tarea diaria (mantiene activo Supabase)
+                  + layout raíz (SEO, fuentes), 404, error, sitemap, robots, íconos, OG
   components/
+    admin/        LoginForm, SettingsEditor, AdminNotice
     brand/        Wordmark, Brush, Stamp, Sparks
     home/         Hero, Marquee, StorySection, HowToOrder
     menu/         MenuSection (filtros), ProductCard
     cart/         CartProvider, CartBar, CartDrawer, CartLines, CheckoutForm, OrderButton
-    layout/       Header, Footer, OpenStatus
+    layout/       SiteShell, Header, Footer, OpenStatus
     ui/           Button, Icon, QuantityStepper
-  config/site.ts  WhatsApp, horarios, pagos, envíos
+  config/site.ts  WhatsApp, horarios, dirección, pagos, envíos
   data/           products.ts, categories.ts
-  lib/            catálogo, carrito (reducer/store/persistencia), WhatsApp, checkout, horarios, analytics, SEO
+  lib/            catálogo, ajustes del panel, Supabase, carrito, WhatsApp, checkout, horarios, analytics, SEO
+  proxy.ts        renueva la sesión del panel (solo /admin)
 docs/             ADMIN.md · PENDIENTES.md · DESIGN-SYSTEM.md
-supabase/         schema.sql (para un futuro panel; no conectado)
+supabase/         schema.sql (tablas, RLS y permisos del panel)
 scripts/          product-image.mjs
 ```
 
 ## Documentación
 
-- [docs/ADMIN.md](docs/ADMIN.md): cómo cambiar precios, agotados, fotos y datos del negocio.
+- [docs/ADMIN.md](docs/ADMIN.md): panel de administrador (cómo activarlo) y cómo cambiar precios, agotados, fotos y datos del negocio.
 - [docs/PENDIENTES.md](docs/PENDIENTES.md): datos que faltan y decisiones a confirmar.
 - [docs/DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md): colores, tipografía, componentes, contraste.
 

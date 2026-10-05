@@ -144,8 +144,14 @@ export function Header() {
               </p>
               <p className="flex items-center gap-2">
                 <Icon name="scooter" size={18} className="text-mustard" />
-                Envíos en {siteConfig.delivery.area} y retiro
+                Envíos en {siteConfig.delivery.area}
               </p>
+              {siteConfig.location.streetAddress ? (
+                <p className="flex items-center gap-2">
+                  <Icon name="pin" size={18} className="text-mustard" />
+                  Retiro en {siteConfig.location.streetAddress}
+                </p>
+              ) : null}
             </div>
           </nav>
           <div className="container-page grid shrink-0 grid-cols-2 gap-2 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">

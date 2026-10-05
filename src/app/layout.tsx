@@ -1,12 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Montserrat } from "next/font/google";
-import { CartBar } from "@/components/cart/CartBar";
-import { CartDrawer } from "@/components/cart/CartDrawer";
-import { CartProvider } from "@/components/cart/CartProvider";
-import { Footer } from "@/components/layout/Footer";
-import { Header } from "@/components/layout/Header";
 import { siteConfig } from "@/config/site";
-import { getMenu } from "@/lib/catalog";
 import "./globals.css";
 
 const bebas = Bebas_Neue({
@@ -60,8 +54,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const menu = await getMenu();
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es-AR" className={`${bebas.variable} ${montserrat.variable}`}>
       <body>
@@ -71,15 +64,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         >
           Saltar al contenido
         </a>
-        <CartProvider products={menu.products} categories={menu.categories}>
-          <Header />
-          <main id="contenido" tabIndex={-1} className="outline-none">
-            {children}
-          </main>
-          <Footer />
-          <CartBar />
-          <CartDrawer />
-        </CartProvider>
+        {children}
       </body>
     </html>
   );

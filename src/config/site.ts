@@ -37,8 +37,8 @@ export const siteConfig = {
     city: "Santa Fe",
     region: "Santa Fe",
     country: "AR",
-    /** PENDIENTE: dirección de retiro. Mientras sea null, el retiro se coordina por WhatsApp. */
-    streetAddress: null as string | null,
+    /** Dirección de retiro. Con `null`, la web dice que el punto se coordina por WhatsApp. */
+    streetAddress: "San José 2474" as string | null,
   },
 
   delivery: {
@@ -46,11 +46,11 @@ export const siteConfig = {
     note: "Consultanos tu zona y te confirmamos.",
   },
 
-  /** Todos los días. Fuente: historia "Todos los días" (3/8/2026). */
+  /** Todos los días. Confirmado por el dueño (5/10/2026). */
   hours: {
     timeZone: "America/Argentina/Cordoba",
     ranges: [
-      { open: "10:30", close: "17:30" },
+      { open: "10:45", close: "17:00" },
       { open: "19:00", close: "00:30" },
     ] satisfies TimeRange[],
   },

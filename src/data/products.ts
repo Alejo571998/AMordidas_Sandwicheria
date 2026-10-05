@@ -9,6 +9,10 @@
  * - Foto nueva:      agregá el .webp en src/assets/products/ y cambiá el import.
  *
  * Ingredientes según las piezas oficiales del feed (19/9/2026).
+ * Precios según el menú vigente que pasó el dueño (5/10/2026).
+ *
+ * Con el panel de administrador conectado (ver docs/ADMIN.md), precio, stock y visibilidad
+ * se manejan desde /admin y lo de este archivo queda como valor inicial.
  */
 import type { Product } from "@/types/product";
 
@@ -29,7 +33,7 @@ export const products: Product[] = [
     category: "sanguches",
     description: "La milanesa de carne de toda la vida, en versión sanguche XL.",
     ingredients: ["Pan de lomo gratinado", "Mostanesa", "Milanesa de carne", "Queso sardo", "Rúcula", "Tomate"],
-    price: null, // PENDIENTE
+    price: 12560,
     image: {
       src: milandwichCarneImg,
       alt: "Milandwich de carne: milanesa, queso sardo, rúcula y tomate en pan de lomo gratinado",
@@ -46,7 +50,7 @@ export const products: Product[] = [
     category: "sanguches",
     description: "Milanesa de pollo crocante y bien cargado. El que nunca falla.",
     ingredients: ["Pan de lomo gratinado", "Mostanesa", "Milanesa de pollo", "Queso sardo", "Rúcula", "Tomate"],
-    price: null, // PENDIENTE
+    price: 10400,
     image: {
       src: milandwichPolloImg,
       alt: "Milandwich de pollo: milanesa de pollo, queso sardo, rúcula, tomate y mostanesa en pan de lomo gratinado",
@@ -69,7 +73,7 @@ export const products: Product[] = [
       "Cebolla caramelizada",
       "Queso muzzarella",
     ],
-    price: null, // PENDIENTE
+    price: 11690,
     image: {
       src: aPolloImg,
       alt: "Sanguche A-Pollo: pollo cremoso en cubos con cebolla caramelizada y muzzarella en pan de lomo gratinado",
@@ -86,7 +90,7 @@ export const products: Product[] = [
     category: "sanguches",
     description: "Jamón crudo y pesto de albahaca. Un clásico que no falla.",
     ingredients: ["Pan de molde", "Pesto de albahaca", "Jamón crudo", "Queso muzzarella", "Rúcula", "Tomate"],
-    price: null, // PENDIENTE
+    price: 14190,
     image: {
       src: crudoImg,
       alt: "Sanguche Crudo: jamón crudo, muzzarella, rúcula y tomate en pan de molde",
@@ -101,7 +105,7 @@ export const products: Product[] = [
     category: "sanguches",
     description: "Jamón y queso con tomates cherry asados. Nunca pasa de moda.",
     ingredients: ["Pan de molde", "Ketchup", "Jamón cocido", "Queso muzzarella", "Tomates cherry asados"],
-    price: null, // PENDIENTE
+    price: 9150,
     image: {
       src: classicImg,
       alt: "Sanguche Classic: jamón cocido, muzzarella y tomates cherry asados en pan de molde",
@@ -116,7 +120,7 @@ export const products: Product[] = [
     category: "sanguches",
     description: "Dos quesos fundidos y cebolla caramelizada. Para fans del queso.",
     ingredients: ["Pan de molde tostado", "Mostanesa", "Queso muzzarella", "Queso tybo", "Cebolla caramelizada"],
-    price: null, // PENDIENTE
+    price: 8990,
     image: {
       src: elDerretidoImg,
       alt: "Sanguche El Derretido: muzzarella y tybo fundidos con cebolla caramelizada en pan de molde tostado",
@@ -139,7 +143,7 @@ export const products: Product[] = [
       "Cebolla caramelizada",
       "Ketchup",
     ],
-    price: null, // PENDIENTE
+    price: 8490,
     image: {
       src: gulaImg,
       alt: "Hamburguesa Gula: doble medallón smash, doble cheddar y cebolla caramelizada en pan gratinado",
@@ -150,7 +154,8 @@ export const products: Product[] = [
     order: 1,
   },
 
-  // --- Fuera de carta (no figuran en el feed de septiembre). Activalos con `active: true`.
+  // --- Fuera de carta: figuran en el menú con precio pero no en el feed de septiembre.
+  // Activalos con `active: true` (o desde el panel, cuando esté conectado).
   {
     id: "brunchwich",
     name: "Brunchwich",
@@ -165,7 +170,7 @@ export const products: Product[] = [
       "Panceta ahumada crocante",
       "Huevo a la plancha",
     ],
-    price: null,
+    price: 11450,
     image: {
       src: brunchwichImg,
       alt: "Brunchwich: palta, panceta crocante, huevo a la plancha, rúcula y muzzarella en focaccia",
@@ -180,7 +185,7 @@ export const products: Product[] = [
     category: "sanguches",
     description: "La delicia de siempre, dentro de un bagel.",
     ingredients: ["Bagel", "Alioli de limón", "Albahaca", "Queso muzzarella", "Tomates cherry asados"],
-    price: null,
+    price: 10300,
     image: {
       src: capresseImg,
       alt: "Sanguche Capresse: muzzarella, albahaca y tomates cherry asados en bagel",

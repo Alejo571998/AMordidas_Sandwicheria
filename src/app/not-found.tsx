@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Stamp } from "@/components/brand/Brand";
+import { SiteShell } from "@/components/layout/SiteShell";
 import { ButtonLink } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
@@ -8,6 +9,14 @@ export const metadata: Metadata = {
 };
 
 export default function NotFound() {
+  return (
+    <SiteShell>
+      <NotFoundContent />
+    </SiteShell>
+  );
+}
+
+function NotFoundContent() {
   return (
     <section className="bg-cream bg-grain py-section">
       <div className="container-page flex flex-col items-center text-center">
