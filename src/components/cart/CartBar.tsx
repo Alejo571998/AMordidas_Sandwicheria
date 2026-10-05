@@ -43,7 +43,10 @@ export function CartBar() {
               <Icon name="check" size={16} />
             </span>
             <span className="min-w-0 flex-1 truncate">
-              Sumaste <strong>{lastAdded.quantity}× {lastAdded.product.name}</strong>
+              Sumaste{" "}
+              <strong>
+                {lastAdded.quantity}× <span translate="no">{lastAdded.product.name}</span>
+              </strong>
             </span>
           </div>
         ) : null}
@@ -73,7 +76,7 @@ export function CartBar() {
               <span className="tabular block truncate font-bold">{totalLabel}</span>
             )}
           </span>
-          <span className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-olive-600 px-4 text-[0.8125rem] font-bold tracking-[0.06em] text-white uppercase">
+          <span className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-olive-600 px-4 text-[0.8125rem] max-[359px]:px-3 font-bold tracking-[0.06em] text-white uppercase">
             Ver pedido
             <Icon name="arrowRight" size={16} className="max-[389px]:hidden" />
           </span>

@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import { track } from "@/lib/analytics";
+import { MAX_QUANTITY_PER_ITEM } from "@/lib/cart/reducer";
 import { summarizeCart, type CartSummary } from "@/lib/cart/selectors";
 import { cartStore } from "@/lib/cart/store";
 import { emptyCheckout, type CheckoutForm } from "@/lib/checkout";
@@ -69,10 +70,14 @@ export function CartProvider({
 
   const addItem = useCallback((product: Product, quantity: number) => {
     if (!product.available || quantity <= 0) return;
-    cartStore.dispatch({ type: "add", productId: product.id, quantity });
+    // El aviso y la medición cuentan lo que realmente entró (hay tope por producto).
+    const current = cartStore.getSnapshot().lines.find((l) => l.productId === product.id)?.quantity ?? 0;
+    const added = Math.min(quantity, MAX_QUANTITY_PER_ITEM - current);
+    if (added <= 0) return;
+    cartStore.dispatch({ type: "add", productId: product.id, quantity: added });
     noticeKey.current += 1;
-    setLastAdded({ key: noticeKey.current, product, quantity });
-    track("add_to_cart", { product_id: product.id, product_name: product.name, quantity, price: product.price });
+    setLastAdded({ key: noticeKey.current, product, quantity: added });
+    track("add_to_cart", { product_id: product.id, product_name: product.name, quantity: added, price: product.price });
   }, []);
 
   const removeItem = useCallback(

@@ -134,7 +134,8 @@ export function MenuSection() {
             <li className="flex items-start gap-3 rounded-lg bg-olive-100/70 p-4">
               <Icon name="leaf" size={20} className="mt-0.5 shrink-0 text-olive-700" />
               <span>
-                <strong className="font-bold">¿Sin carne?</strong> {veggie.map((p) => p.name).join(" y ")}{" "}
+                <strong className="font-bold">¿Sin carne?</strong>{" "}
+                <span translate="no">{veggie.map((p) => p.name).join(" y ")}</span>{" "}
                 {veggie.length === 1 ? "es vegetariano" : "son vegetarianos"}. Consultanos por más opciones.
               </span>
             </li>

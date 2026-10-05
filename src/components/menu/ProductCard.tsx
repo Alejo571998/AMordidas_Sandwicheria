@@ -7,6 +7,7 @@ import { useCart } from "@/components/cart/CartProvider";
 import { Icon } from "@/components/ui/Icon";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { track } from "@/lib/analytics";
+import { MAX_QUANTITY_PER_ITEM } from "@/lib/cart/reducer";
 import { cn, formatPrice } from "@/lib/format";
 import type { Product } from "@/types/product";
 
@@ -26,6 +27,10 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
   const ref = useRef<HTMLElement>(null);
   const addedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const inCart = hydrated && product.available ? quantityOf(product.id) : 0;
+  // Tope por producto: el selector nunca ofrece más de lo que entra en el pedido.
+  const remaining = MAX_QUANTITY_PER_ITEM - inCart;
+  const atLimit = remaining <= 0;
+  const qty = Math.min(quantity, Math.max(1, remaining));
   const isWide = layout === "wide";
   const isVeggie = product.tags?.includes("vegetariano");
 
@@ -49,7 +54,8 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
   useEffect(() => () => clearTimeout(addedTimer.current), []);
 
   const handleAdd = () => {
-    addItem(product, quantity);
+    if (atLimit) return;
+    addItem(product, qty);
     setQuantity(1);
     setJustAdded(true);
     clearTimeout(addedTimer.current);
@@ -145,7 +151,8 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
         </div>
 
         <div className="mt-2 flex items-start justify-between gap-3">
-          <h3 id={titleId} className={cn("font-display text-charcoal", isWide ? "text-display-lg" : "text-display-md")}>
+          {/* translate="no": los nombres son marcas. Sin esto, el traductor de Chrome convierte "Gula" en "Azúcar". */}
+          <h3 id={titleId} translate="no" className={cn("font-display text-charcoal", isWide ? "text-display-lg" : "text-display-md")}>
             {product.name}
           </h3>
           {product.price !== null ? (
@@ -168,20 +175,30 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
           {product.available ? (
             <div className="flex items-center gap-2">
               <QuantityStepper
-                value={quantity}
+                value={qty}
+                max={Math.max(1, remaining)}
                 itemLabel={product.name}
-                onDecrement={() => setQuantity((q) => Math.max(1, q - 1))}
-                onIncrement={() => setQuantity((q) => q + 1)}
+                onDecrement={() => setQuantity(Math.max(1, qty - 1))}
+                onIncrement={() => setQuantity(qty + 1)}
                 tone="paper"
               />
               <button
                 type="button"
                 onClick={handleAdd}
-                aria-label={justAdded ? `${product.name} agregado al pedido` : `Agregar ${quantity} ${product.name} al pedido`}
+                disabled={atLimit && !justAdded}
+                aria-label={
+                  justAdded
+                    ? `${product.name} agregado al pedido`
+                    : atLimit
+                      ? `Ya tenés el máximo de ${product.name} en tu pedido`
+                      : `Agregar ${qty} ${product.name} al pedido`
+                }
                 className={cn(
                   "inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full px-4 text-[0.8125rem] font-bold tracking-[0.06em] uppercase",
                   "transition-[background-color,transform] duration-200 active:scale-[0.97]",
-                  justAdded ? "bg-mustard text-charcoal" : "bg-olive-600 text-white shadow-cta-olive hover:bg-olive-700",
+                  justAdded
+                    ? "bg-mustard text-charcoal"
+                    : "bg-olive-600 text-white shadow-cta-olive hover:bg-olive-700 disabled:bg-charcoal/10 disabled:text-ink-muted disabled:shadow-none",
                 )}
               >
                 {justAdded ? (
@@ -189,11 +206,13 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
                     <Icon name="check" size={18} className="animate-pop" />
                     Agregado
                   </>
+                ) : atLimit ? (
+                  <span className="leading-tight text-balance">Máximo {MAX_QUANTITY_PER_ITEM} por pedido</span>
                 ) : (
                   <>
                     <Icon name="plus" size={18} />
                     Agregar
-                    {product.price !== null ? <span className="tabular">· {formatPrice(product.price * quantity)}</span> : null}
+                    {product.price !== null ? <span className="tabular">· {formatPrice(product.price * qty)}</span> : null}
                   </>
                 )}
               </button>

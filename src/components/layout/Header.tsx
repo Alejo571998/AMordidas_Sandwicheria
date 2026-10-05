@@ -58,7 +58,7 @@ export function Header() {
       <div className="container-page flex h-full items-center gap-4">
         <a href="#inicio" className="group -m-1 flex flex-col items-start gap-0.5 rounded-sm p-1" aria-label={`${siteConfig.name} ${siteConfig.tagline} — inicio`}>
           <Wordmark className="h-7 text-white transition-transform duration-300 group-hover:-rotate-2 lg:h-8 lg:text-charcoal" label="" />
-          <span aria-hidden className="flex w-full items-center gap-1.5 pl-1 text-[0.5625rem] font-bold tracking-[0.32em] whitespace-nowrap text-cream max-[359px]:tracking-[0.2em] lg:text-orange-600">
+          <span aria-hidden translate="no" className="flex w-full items-center gap-1.5 pl-1 text-[0.5625rem] font-bold tracking-[0.32em] whitespace-nowrap text-cream max-[359px]:tracking-[0.2em] lg:text-orange-600">
             <span className="h-px flex-1 bg-current opacity-50" />
             DELI HOUSE
             <span className="h-px flex-1 bg-current opacity-50" />

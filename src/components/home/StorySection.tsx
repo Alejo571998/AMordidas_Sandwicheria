@@ -80,7 +80,7 @@ export function StorySection() {
               Fe. Buscaban tiempo, raíces y un proyecto propio.
             </p>
             <p>
-              Tenían algo más en común: una debilidad seria por los buenos sanguches. Así nació {siteConfig.name}:
+              Tenían algo más en común: una debilidad seria por los buenos sanguches. Así nació <span translate="no">{siteConfig.name}</span>:
               ingredientes elegidos con cuidado, todo hecho a mano y sin apuro.
             </p>
             <p className="font-display text-display-sm text-olive-700">

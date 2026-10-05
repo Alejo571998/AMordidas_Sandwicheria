@@ -13,7 +13,7 @@ const stagger = (i: number) => ({ "--i": i }) as CSSProperties;
 
 /**
  * Mobile: fondo naranja (la marca entra con energía, como en las historias de IG).
- * Desktop: fondo marfil con composición editorial y pincelada oliva.
+ * Desktop: fondo marfil con composición editorial y pincelada naranja.
  */
 export function Hero() {
   return (
@@ -31,7 +31,7 @@ export function Hero() {
       <div className="container-page relative grid items-center gap-6 pt-8 sm:pt-12 lg:grid-cols-[1.05fr_1fr] lg:gap-4 lg:pt-14 lg:pb-16">
         <div className="relative z-10 max-w-[38rem]">
           <p className="hero-enter eyebrow text-cream lg:text-orange-600" style={stagger(0)}>
-            Sanguchería · Deli House · Santa Fe
+            Sanguchería · <span translate="no">Deli House</span> · Santa Fe
           </p>
 
           <h1 id="hero-title" className="mt-4 font-display text-display-2xl uppercase lg:text-[clamp(4.25rem,0.5rem+6.4vw,6.75rem)]">
@@ -86,7 +86,7 @@ export function Hero() {
         <div className="relative -mr-[6vw] -mb-14 sm:mx-auto sm:-mb-20 sm:w-[72%] lg:mr-0 lg:-mb-28 lg:w-auto">
           <Stamp
             spin
-            className="absolute top-[-20%] right-[20%] size-24 text-cream/90 sm:size-32 lg:top-[-12%] lg:right-auto lg:left-[2%] lg:size-36 lg:text-orange-600"
+            className="absolute top-[-20%] right-[4%] size-20 text-cream/90 min-[460px]:top-0 sm:right-[-6%] sm:size-32 lg:top-[-12%] lg:right-auto lg:left-[2%] lg:size-36 lg:text-orange-600"
           />
           <Image
             src={gulaCutout}

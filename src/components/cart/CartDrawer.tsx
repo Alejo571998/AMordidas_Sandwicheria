@@ -211,7 +211,8 @@ export function CartDrawer() {
                   <Icon name="whatsapp" size={16} className="text-whatsapp" />
                   Así nos llega tu mensaje
                 </p>
-                <div className="relative ml-auto max-w-[94%] rounded-lg rounded-tr-xs bg-[#d9fdd3] px-3.5 py-3 text-[0.875rem] leading-relaxed whitespace-pre-wrap text-[#111b21] shadow-[0_1px_0.5px_rgb(11_20_26/0.13)]">
+                {/* Es el texto exacto que se envía: el traductor del navegador no debe cambiarlo. */}
+                <div translate="no" className="relative ml-auto max-w-[94%] rounded-lg rounded-tr-xs bg-[#d9fdd3] px-3.5 py-3 text-[0.875rem] leading-relaxed whitespace-pre-wrap text-[#111b21] shadow-[0_1px_0.5px_rgb(11_20_26/0.13)]">
                   <WhatsAppText text={message} />
                 </div>
               </div>

@@ -19,6 +19,8 @@ function InfoBlock({ title, children }: { title: string; children: React.ReactNo
 
 const linkClass =
   "flex w-fit min-h-11 items-center gap-2 font-semibold text-cream underline-offset-4 hover:text-mustard hover:underline";
+const invitationClass =
+  "block w-fit py-2.5 font-semibold text-cream underline-offset-4 hover:text-mustard hover:underline";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -26,7 +28,8 @@ export function Footer() {
     <footer id="contacto" aria-labelledby="contacto-title" className="focus-on-dark relative mt-6 bg-olive-950 bg-grain text-cream">
       <Brush name="torn" className="absolute -top-[22px] left-0 h-6 w-full text-olive-950" />
 
-      <div className="container-page pt-20 pb-32 md:pb-14">
+      {/* Espacio inferior: la barra flotante "Ver pedido" no tapa el cierre del footer. */}
+      <div className="container-page pt-20 pb-32 md:pb-28">
         <div className="grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
           <div>
             <h2 id="contacto-title" className="font-display text-display-xl">
@@ -95,14 +98,15 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Texto en línea: si el renglón corta, la flecha sigue pegada a la última palabra. */}
         <div className="mt-16 grid gap-4 border-y border-cream/10 py-6 text-[0.9375rem] sm:grid-cols-2">
-          <a href={buildWhatsAppUrl(contactMessages.work)} {...external} className={linkClass}>
+          <a href={buildWhatsAppUrl(contactMessages.work)} {...external} className={invitationClass}>
             ¿Querés trabajar con nosotros? Contanos
-            <Icon name="arrowRight" size={16} />
+            <Icon name="arrowRight" size={16} className="ml-1.5 inline-block align-[-3px]" />
           </a>
-          <a href={buildWhatsAppUrl(contactMessages.review)} {...external} className={`${linkClass} sm:justify-self-end`}>
+          <a href={buildWhatsAppUrl(contactMessages.review)} {...external} className={`${invitationClass} sm:justify-self-end`}>
             ¿Ya nos probaste? Dejanos tu reseña
-            <Icon name="arrowRight" size={16} />
+            <Icon name="arrowRight" size={16} className="ml-1.5 inline-block align-[-3px]" />
           </a>
         </div>
 
@@ -110,7 +114,7 @@ export function Footer() {
           <div className="flex items-end gap-5">
             <div>
               <Wordmark className="h-16 text-cream sm:h-20" />
-              <p className="mt-2 flex items-center gap-2 pl-2 text-[0.75rem] font-bold tracking-[0.32em] text-mustard">
+              <p translate="no" className="mt-2 flex items-center gap-2 pl-2 text-[0.75rem] font-bold tracking-[0.32em] text-mustard">
                 <span className="h-px w-6 bg-mustard/60" />
                 DELI HOUSE
                 <span className="h-px w-6 bg-mustard/60" />
@@ -120,7 +124,11 @@ export function Footer() {
           </div>
           <div className="space-y-1 text-[0.8125rem] text-cream/60 md:text-right">
             <p>
-              © {year} {siteConfig.name} — {siteConfig.tagline}. {siteConfig.location.city}, Argentina.
+              © {year}{" "}
+              <span translate="no">
+                {siteConfig.name} — {siteConfig.tagline}
+              </span>
+              . {siteConfig.location.city}, Argentina.
             </p>
             <p>No guardamos tus datos: tu pedido viaja directo a nuestro WhatsApp.</p>
           </div>

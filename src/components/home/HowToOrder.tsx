@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Sparks } from "@/components/brand/Brand";
 import { OrderButton } from "@/components/cart/OrderButton";
 import { Icon, type IconName } from "@/components/ui/Icon";
@@ -13,8 +14,15 @@ const steps: Array<{ icon: IconName; title: string; text: string }> = [
 const [firstRange, ...restRanges] = siteConfig.hours.ranges;
 
 /** Preguntas frecuentes reales (historias destacadas de Instagram). */
-const faqs: Array<{ q: string; a: string }> = [
-  { q: "¿Hacen delivery?", a: "¡Claro! Llevamos A Mordidas hasta tu puerta. O si preferís, podés pasar a retirarlo." },
+const faqs: Array<{ q: string; a: ReactNode }> = [
+  {
+    q: "¿Hacen delivery?",
+    a: (
+      <>
+        ¡Claro! Llevamos <span translate="no">A Mordidas</span> hasta tu puerta. O si preferís, podés pasar a retirarlo.
+      </>
+    ),
+  },
   { q: "¿Hasta dónde hacen envíos?", a: `Dentro de ${siteConfig.delivery.area}. ${siteConfig.delivery.note}` },
   {
     q: "¿Qué horarios tienen?",
@@ -24,7 +32,14 @@ const faqs: Array<{ q: string; a: string }> = [
     q: "¿Puedo hacer un pedido anticipado?",
     a: "Por supuesto. Lo dejás encargado y lo retirás o lo recibís a la hora que necesites.",
   },
-  { q: "¿Tienen opción vegetariana?", a: "Sí. El Derretido no lleva carne, y siempre podés consultarnos por más opciones." },
+  {
+    q: "¿Tienen opción vegetariana?",
+    a: (
+      <>
+        Sí. <span translate="no">El Derretido</span> no lleva carne, y siempre podés consultarnos por más opciones.
+      </>
+    ),
+  },
   { q: "¿Qué medios de pago aceptan?", a: `${siteConfig.paymentMethods.join(", ").replace(/, ([^,]*)$/, " y $1")}.` },
 ];
 

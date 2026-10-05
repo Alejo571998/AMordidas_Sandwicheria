@@ -27,7 +27,7 @@ export function CartLineItem({ line }: { line: ResolvedLine }) {
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="truncate font-display text-[1.375rem] leading-none text-charcoal">{product.name}</p>
+            <p translate="no" className="truncate font-display text-[1.375rem] leading-none text-charcoal">{product.name}</p>
             <p className="mt-1 text-[0.8125rem] text-ink-muted">
               {product.price !== null ? `${formatPrice(product.price)} c/u` : "Precio a confirmar"}
             </p>
@@ -56,7 +56,7 @@ export function UnavailableLineItem({ line }: { line: ResolvedLine }) {
         <LineThumb line={line} />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate font-display text-[1.375rem] leading-none text-charcoal line-through decoration-1">
+        <p translate="no" className="truncate font-display text-[1.375rem] leading-none text-charcoal line-through decoration-1">
           {line.product.name}
         </p>
         <p className="mt-1 text-[0.8125rem] font-semibold text-danger">Se agotó por hoy. No va en el pedido.</p>
@@ -129,7 +129,7 @@ export function OrderSummary({ lines, total, className }: { lines: ResolvedLine[
         {lines.map(({ product, quantity, lineTotal }) => (
           <li key={product.id} className="flex justify-between gap-3">
             <span className="min-w-0">
-              <span className="tabular font-bold">{quantity}×</span> {product.name}
+              <span className="tabular font-bold">{quantity}×</span> <span translate="no">{product.name}</span>
             </span>
             <span className="tabular shrink-0 text-ink-muted">{lineTotal !== null ? formatPrice(lineTotal) : "a confirmar"}</span>
           </li>

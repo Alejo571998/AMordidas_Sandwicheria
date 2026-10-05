@@ -69,3 +69,4 @@ Escala fluida: `text-display-2xl` (hero) · `-xl` (títulos de sección) · `-lg
 - Diálogos nativos `<dialog>` (foco atrapado, Escape, scroll bloqueado).
 - Anillo de foco de 3 px: carbón por defecto, mostaza en zonas oscuras (`focus-on-dark`).
 - Áreas táctiles ≥ 44 px, link "Saltar al contenido", `aria-live` para lo que se agrega al pedido, errores de formulario asociados con `aria-describedby`.
+- Nombres de productos y de la marca con `translate="no"`: el traductor del navegador los respeta (sin esto, "Gula" se traducía como "Azúcar"). Al agregar un lugar nuevo donde se muestre un nombre de producto, mantener el atributo.
