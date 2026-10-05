@@ -17,17 +17,12 @@ Ningún dato del negocio se inventó. Esto es lo que falta o tiene versiones dis
 | Dirección de retiro | San José 2474, Santa Fe |
 | Horarios | Todos los días, 10:45 a 17:00 y 19:00 a 00:30 |
 | WhatsApp | 342 428-1946 |
-
-## Para decidir
-
-| Tema | Opciones encontradas | Hoy en la web |
-| --- | --- | --- |
-| Capresse y Brunchwich | Están en el menú con precio, pero no en el feed de septiembre | **Ocultos**, con su precio cargado. Se muestran con `active: true` o desde el panel |
-| Crudo | Pan de campo (menú) / pan de molde (feed 19/9) | **Pan de molde** |
-| Classic | Jamón natural y tybo (menú) / jamón cocido y muzzarella (feed 19/9) | **Jamón cocido y muzzarella** |
-| Nombre | "Milangüich" (menú) / "Milandwich" (feed y sitio anterior) | **Milandwich** |
-| Brunchwich | Pan de lomo gratinado (menú) / focaccia (sitio anterior y su foto) | **Focaccia** |
-| Medios de pago | Efectivo y transferencia (FAQ) / débito, crédito, efectivo, Mercado Pago (sitio anterior) | **Todos** |
+| Carta | Se muestran los 9 productos, incluidos Capresse y Brunchwich. Textos como en el feed |
+| Crudo | Pan de molde |
+| Classic | Jamón natural y muzzarella |
+| Nombre | Milandwich |
+| Brunchwich | Pan de lomo gratinado |
+| Medios de pago | Efectivo y transferencia |
 
 ## Fuentes usadas
 
@@ -41,4 +36,5 @@ Ningún dato del negocio se inventó. Esto es lo que falta o tiene versiones dis
 ## Para revisar con el equipo
 
 - Las fotos de producto de Classic, Crudo y El Derretido son las mismas que usa el feed (estilo estudio). Si tienen fotos propias recientes de esos productos, conviene reemplazarlas con `npm run product-image`.
+- La foto del Brunchwich es de la versión anterior (en focaccia). Cuando tengan una foto en pan de lomo gratinado, reemplazarla con `npm run product-image -- "recorte.png" brunchwich`.
 - Si el envío tiene costo, sumarlo como texto en `src/config/site.ts` → `delivery.note`. Hoy el total del pedido es solo de los productos.

@@ -5,7 +5,7 @@ export const categories: Category[] = [
     id: "sanguches",
     label: "Sanguches",
     singular: "Sanguche",
-    description: "En pan de lomo gratinado o pan de molde tostado.",
+    description: "En pan de lomo gratinado, pan de molde tostado o bagel.",
     order: 1,
   },
   {

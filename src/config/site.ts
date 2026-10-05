@@ -55,7 +55,8 @@ export const siteConfig = {
     ] satisfies TimeRange[],
   },
 
-  paymentMethods: ["Efectivo", "Transferencia", "Mercado Pago", "Tarjeta de débito y crédito"],
+  /** Confirmado por el dueño (5/10/2026). */
+  paymentMethods: ["Efectivo", "Transferencia"],
   currency: "ARS",
 } as const;
 

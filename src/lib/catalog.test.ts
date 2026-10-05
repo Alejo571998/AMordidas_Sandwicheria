@@ -19,9 +19,16 @@ describe("catálogo real", () => {
       "crudo",
       "classic",
       "el-derretido",
+      "brunchwich",
+      "capresse",
       "gula",
     ]);
     expect(menu.categories.map((c) => c.id)).toEqual(["sanguches", "hamburguesas"]);
+  });
+
+  it("un producto oculto no aparece en la carta", () => {
+    const hidden = products.map((p) => (p.id === "capresse" ? { ...p, active: false } : p));
+    expect(buildMenu(categories, hidden).products.some((p) => p.id === "capresse")).toBe(false);
   });
 
   it("ningún precio inventado: todo precio es null o un entero positivo", () => {

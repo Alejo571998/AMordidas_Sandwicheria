@@ -61,9 +61,11 @@ describe("applySettings", () => {
     expect(result.find((p) => p.id === "classic")).toBe(products.find((p) => p.id === "classic"));
   });
 
-  it("puede activar un producto oculto", () => {
-    const map = parseSettingsRows([{ product_id: "capresse", price: 10300, available: true, active: true }], known);
-    expect(applySettings(products, map).find((p) => p.id === "capresse")?.active).toBe(true);
+  it("puede ocultar y volver a mostrar un producto", () => {
+    const hidden = parseSettingsRows([{ product_id: "capresse", price: 10300, available: true, active: false }], known);
+    expect(applySettings(products, hidden).find((p) => p.id === "capresse")?.active).toBe(false);
+    const shown = parseSettingsRows([{ product_id: "capresse", price: 10300, available: true, active: true }], known);
+    expect(applySettings(products, shown).find((p) => p.id === "capresse")?.active).toBe(true);
   });
 
   it("sin filas devuelve la carta tal cual", () => {

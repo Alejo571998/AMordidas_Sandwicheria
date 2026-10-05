@@ -13,6 +13,14 @@ const steps: Array<{ icon: IconName; title: string; text: string }> = [
 
 const [firstRange, ...restRanges] = siteConfig.hours.ranges;
 
+/** ["Efectivo", "Transferencia"] → "Efectivo y transferencia" */
+function paymentSentence(methods: readonly string[]): string {
+  const [first, ...rest] = methods;
+  const tail = rest.map((m) => m.charAt(0).toLowerCase() + m.slice(1));
+  if (tail.length === 0) return first;
+  return `${[first, ...tail.slice(0, -1)].join(", ")} y ${tail.at(-1)}`;
+}
+
 /** Preguntas frecuentes reales (historias destacadas de Instagram). */
 const faqs: Array<{ q: string; a: ReactNode }> = [
   {
@@ -41,7 +49,7 @@ const faqs: Array<{ q: string; a: ReactNode }> = [
       </>
     ),
   },
-  { q: "¿Qué medios de pago aceptan?", a: `${siteConfig.paymentMethods.join(", ").replace(/, ([^,]*)$/, " y $1")}.` },
+  { q: "¿Qué medios de pago aceptan?", a: `${paymentSentence(siteConfig.paymentMethods)}.` },
 ];
 
 export function HowToOrder() {

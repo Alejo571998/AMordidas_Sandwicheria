@@ -8,7 +8,8 @@
  * - Destacar:        `featured: true` / `badge: "Nuevo"`.
  * - Foto nueva:      agregá el .webp en src/assets/products/ y cambiá el import.
  *
- * Ingredientes según las piezas oficiales del feed (19/9/2026).
+ * Ingredientes según las piezas oficiales del feed (19/9/2026), con los ajustes que confirmó
+ * el dueño el 5/10/2026 (Classic con jamón natural, Brunchwich en pan de lomo gratinado).
  * Precios según el menú vigente que pasó el dueño (5/10/2026).
  *
  * Con el panel de administrador conectado (ver docs/ADMIN.md), precio, stock y visibilidad
@@ -104,11 +105,11 @@ export const products: Product[] = [
     name: "Classic",
     category: "sanguches",
     description: "Jamón y queso con tomates cherry asados. Nunca pasa de moda.",
-    ingredients: ["Pan de molde", "Ketchup", "Jamón cocido", "Queso muzzarella", "Tomates cherry asados"],
+    ingredients: ["Pan de molde", "Ketchup", "Jamón natural", "Queso muzzarella", "Tomates cherry asados"],
     price: 9150,
     image: {
       src: classicImg,
-      alt: "Sanguche Classic: jamón cocido, muzzarella y tomates cherry asados en pan de molde",
+      alt: "Sanguche Classic: jamón natural, muzzarella y tomates cherry asados en pan de molde",
     },
     available: true,
     active: true,
@@ -153,16 +154,13 @@ export const products: Product[] = [
     featured: true,
     order: 1,
   },
-
-  // --- Fuera de carta: figuran en el menú con precio pero no en el feed de septiembre.
-  // Activalos con `active: true` (o desde el panel, cuando esté conectado).
   {
     id: "brunchwich",
     name: "Brunchwich",
     category: "sanguches",
     description: "Palta, panceta crocante y huevo a la plancha. Potencia y sabor.",
     ingredients: [
-      "Focaccia",
+      "Pan de lomo gratinado",
       "Alioli de limón",
       "Palta",
       "Rúcula",
@@ -173,10 +171,11 @@ export const products: Product[] = [
     price: 11450,
     image: {
       src: brunchwichImg,
-      alt: "Brunchwich: palta, panceta crocante, huevo a la plancha, rúcula y muzzarella en focaccia",
+      // La foto es de la versión anterior: el alt describe el relleno, no el pan.
+      alt: "Brunchwich: palta, panceta crocante, huevo a la plancha, rúcula y muzzarella",
     },
     available: true,
-    active: false,
+    active: true,
     order: 7,
   },
   {
@@ -191,7 +190,7 @@ export const products: Product[] = [
       alt: "Sanguche Capresse: muzzarella, albahaca y tomates cherry asados en bagel",
     },
     available: true,
-    active: false,
+    active: true,
     tags: ["vegetariano"],
     order: 8,
   },

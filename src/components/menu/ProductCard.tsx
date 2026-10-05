@@ -171,7 +171,8 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
           ))}
         </ul>
 
-        <div className="mt-auto pt-5">
+        {/* @container: el total dentro del botón solo aparece si entra (en tarjetas angostas se ve al lado del nombre). */}
+        <div className="@container mt-auto pt-5">
           {product.available ? (
             <div className="flex items-center gap-2">
               <QuantityStepper
@@ -194,7 +195,7 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
                       : `Agregar ${qty} ${product.name} al pedido`
                 }
                 className={cn(
-                  "inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full px-4 text-[0.8125rem] font-bold tracking-[0.06em] uppercase",
+                  "inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-4 text-[0.8125rem] font-bold tracking-[0.06em] whitespace-nowrap uppercase",
                   "transition-[background-color,transform] duration-200 active:scale-[0.97]",
                   justAdded
                     ? "bg-mustard text-charcoal"
@@ -207,12 +208,14 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
                     Agregado
                   </>
                 ) : atLimit ? (
-                  <span className="leading-tight text-balance">Máximo {MAX_QUANTITY_PER_ITEM} por pedido</span>
+                  <span className="leading-tight whitespace-normal text-balance">Máximo {MAX_QUANTITY_PER_ITEM} por pedido</span>
                 ) : (
                   <>
                     <Icon name="plus" size={18} />
                     Agregar
-                    {product.price !== null ? <span className="tabular">· {formatPrice(product.price * qty)}</span> : null}
+                    {product.price !== null ? (
+                      <span className="tabular hidden @min-[20rem]:inline">· {formatPrice(product.price * qty)}</span>
+                    ) : null}
                   </>
                 )}
               </button>
