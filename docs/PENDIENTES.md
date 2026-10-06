@@ -6,7 +6,7 @@ Ningún dato del negocio se inventó. Esto es lo que falta o tiene versiones dis
 
 | Dato | Estado en la web | Dónde se carga |
 | --- | --- | --- |
-| **Panel de administrador** | Programado y apagado: falta conectar Supabase (otra cuenta del dueño) | Pasos en [`docs/ADMIN.md`](ADMIN.md#activarlo-una-sola-vez-15-minutos) |
+| **Panel de administrador** | Activo en producción. Falta el primer ingreso del dueño (paso 6) | [`docs/ADMIN.md`](ADMIN.md#activarlo-una-sola-vez-15-minutos) |
 | Dominio propio | Usa `a-mordidas-sandwicheria.vercel.app` | Variable `NEXT_PUBLIC_SITE_URL` en Vercel |
 
 ## Confirmados por el dueño (5/10/2026)

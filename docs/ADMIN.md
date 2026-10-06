@@ -21,7 +21,9 @@ Página privada para que el dueño cambie, desde el celular y sin tocar código:
 
 Los cambios se ven en la web apenas se guardan.
 
-**Estado actual: APAGADO.** Falta conectar Supabase (pasos abajo). Mientras tanto, la web usa los precios de `src/data/products.ts` y `/admin` muestra "El panel todavía no está activo".
+**Estado actual: ACTIVO** (conectado el 5/10/2026). Las variables están cargadas solo para *Production*: en los deploys de *Preview* el panel aparece apagado y se usan los precios de `src/data/products.ts`.
+
+Si alguna vez `/admin` dice "El panel todavía no está activo", faltan las variables de Supabase en Vercel o no se hizo *Redeploy* después de cargarlas (paso 5).
 
 ### Cómo se protege
 
