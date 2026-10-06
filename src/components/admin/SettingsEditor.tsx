@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useMemo, useState, type ReactNode } from "react";
 import { saveSettings, type SaveState } from "@/app/admin/actions";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { formatPriceInput, parsePriceInput } from "@/lib/admin/price";
+import { formatStockInput, parseStockInput } from "@/lib/admin/stock-input";
 import { cn, formatPrice, pluralize } from "@/lib/format";
 import type { ProductImage } from "@/types/product";
 
@@ -17,10 +18,14 @@ export interface EditableProduct {
   price: number | null;
   available: boolean;
   active: boolean;
+  /** Unidades que quedan hoy. null = sin límite. */
+  stock: number | null;
 }
 
 interface Draft {
   price: string;
+  /** Texto del campo "Unidades hoy" ("" = sin límite). */
+  stock: string;
   available: boolean;
   active: boolean;
 }
@@ -42,13 +47,17 @@ interface SettingsEditorProps {
   /** Cambia cada vez que se guarda: reinicia los borradores con lo que quedó en la base. */
   version: string;
   lastUpdate: string | null;
+  /** La base ya tiene la columna de unidades (migración 002_stock.sql). */
+  stockEnabled: boolean;
+  /** Contenido extra debajo de la carta (pedidos de hoy). */
+  aside?: ReactNode;
 }
 
 /**
  * Editor de precio, stock y visibilidad. El mensaje de "Guardado" vive acá afuera para
  * sobrevivir al reinicio de los campos después de guardar.
  */
-export function SettingsEditor({ categories, items, version, lastUpdate }: SettingsEditorProps) {
+export function SettingsEditor({ categories, items, version, lastUpdate, stockEnabled, aside }: SettingsEditorProps) {
   const [state, formAction, pending] = useActionState(saveSettings, initialSaveState);
 
   return (
@@ -71,6 +80,13 @@ export function SettingsEditor({ categories, items, version, lastUpdate }: Setti
             <span className="block text-[0.8125rem]">Último cambio: {dateFormatter.format(new Date(lastUpdate))} hs</span>
           ) : null}
         </p>
+        {!stockEnabled ? (
+          <p className="mt-4 flex items-start gap-2 rounded-md bg-paper/70 px-3 py-2.5 text-[0.8125rem] text-ink-muted">
+            <Icon name="info" size={16} className="mt-0.5 shrink-0" />
+            Para cargar unidades por producto falta un paso en la base de datos (docs/ADMIN.md, &quot;Stock por
+            unidades&quot;).
+          </p>
+        ) : null}
       </header>
 
       <EditorFields
@@ -81,17 +97,24 @@ export function SettingsEditor({ categories, items, version, lastUpdate }: Setti
         pending={pending}
         message={state.message}
         messageStatus={state.status}
+        stockEnabled={stockEnabled}
       />
+      {aside}
     </form>
   );
 }
 
 function toDraft(item: EditableProduct): Draft {
-  return { price: formatPriceInput(item.price), available: item.available, active: item.active };
+  return { price: formatPriceInput(item.price), stock: formatStockInput(item.stock), available: item.available, active: item.active };
 }
 
 function priceKey(raw: string): string {
   const parsed = parsePriceInput(raw);
+  return parsed.ok ? String(parsed.value) : `invalid:${raw}`;
+}
+
+function stockKey(raw: string): string {
+  const parsed = parseStockInput(raw);
   return parsed.ok ? String(parsed.value) : `invalid:${raw}`;
 }
 
@@ -102,26 +125,42 @@ interface EditorFieldsProps {
   pending: boolean;
   message: string | null;
   messageStatus: SaveState["status"];
+  stockEnabled: boolean;
 }
 
-function EditorFields({ categories, items, serverErrors, pending, message, messageStatus }: EditorFieldsProps) {
+function EditorFields({ categories, items, serverErrors, pending, message, messageStatus, stockEnabled }: EditorFieldsProps) {
   const original = useMemo(() => new Map(items.map((i) => [i.id, toDraft(i)])), [items]);
   const [drafts, setDrafts] = useState<Record<string, Draft>>(() => Object.fromEntries(original));
 
   const isDirty = (id: string) => {
     const a = drafts[id];
     const b = original.get(id)!;
-    return priceKey(a.price) !== priceKey(b.price) || a.available !== b.available || a.active !== b.active;
+    return (
+      priceKey(a.price) !== priceKey(b.price) ||
+      stockKey(a.stock) !== stockKey(b.stock) ||
+      a.available !== b.available ||
+      a.active !== b.active
+    );
   };
   const dirtyIds = items.filter((i) => isDirty(i.id)).map((i) => i.id);
+  // Errores por campo: "<id>" para el precio y "<id>:stock" para las unidades (igual que el servidor).
   const localErrors = Object.fromEntries(
     dirtyIds.flatMap((id) => {
-      const parsed = parsePriceInput(drafts[id].price);
-      return parsed.ok ? [] : [[id, parsed.error]];
+      const price = parsePriceInput(drafts[id].price);
+      const stock = parseStockInput(drafts[id].stock);
+      return [
+        ...(price.ok ? [] : [[id, price.error]]),
+        ...(stock.ok || !stockEnabled ? [] : [[`${id}:stock`, stock.error]]),
+      ];
     }),
   ) as Record<string, string>;
   const hasErrors = Object.keys(localErrors).length > 0;
-  const changes = JSON.stringify(dirtyIds.map((productId) => ({ productId, ...drafts[productId] })));
+  const changes = JSON.stringify(
+    dirtyIds.map((productId) => {
+      const { price, stock, available, active } = drafts[productId];
+      return { productId, price, available, active, ...(stockEnabled ? { stock } : {}) };
+    }),
+  );
 
   const update = (id: string, patch: Partial<Draft>) => setDrafts((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
   const discard = () => setDrafts(Object.fromEntries(original));
@@ -150,6 +189,8 @@ function EditorFields({ categories, items, serverErrors, pending, message, messa
                     draft={drafts[item.id]}
                     dirty={dirtyIds.includes(item.id)}
                     error={localErrors[item.id] ?? serverErrors[item.id]}
+                    stockError={localErrors[`${item.id}:stock`] ?? serverErrors[`${item.id}:stock`]}
+                    stockEnabled={stockEnabled}
                     onChange={(patch) => update(item.id, patch)}
                   />
                 ))}
@@ -171,7 +212,7 @@ function EditorFields({ categories, items, serverErrors, pending, message, messa
             {dirtyIds.length > 0 ? (
               <span className={hasErrors ? "text-danger" : "text-charcoal"}>
                 {hasErrors
-                  ? "Hay un precio para corregir."
+                  ? "Hay un dato para corregir."
                   : `${pluralize(dirtyIds.length, "cambio", "cambios")} sin guardar`}
               </span>
             ) : showSaved ? (
@@ -204,10 +245,14 @@ function EditorFields({ categories, items, serverErrors, pending, message, messa
   );
 }
 
-function statusText(draft: Draft): string {
-  if (!draft.active) return "Oculto: no aparece en la web";
-  if (!draft.available) return "Agotado por hoy";
-  return "En la carta";
+function statusText(draft: Draft): { text: string; orderable: boolean } {
+  if (!draft.active) return { text: "Oculto: no aparece en la web", orderable: false };
+  const stock = parseStockInput(draft.stock);
+  if (!draft.available || (stock.ok && stock.value === 0)) return { text: "Agotado por hoy", orderable: false };
+  if (stock.ok && stock.value !== null) {
+    return { text: stock.value === 1 ? "En la carta · queda 1" : `En la carta · quedan ${stock.value}`, orderable: true };
+  }
+  return { text: "En la carta", orderable: true };
 }
 
 interface ProductRowProps {
@@ -215,14 +260,29 @@ interface ProductRowProps {
   draft: Draft;
   dirty: boolean;
   error: string | undefined;
+  stockError: string | undefined;
+  stockEnabled: boolean;
   onChange: (patch: Partial<Draft>) => void;
 }
 
-function ProductRow({ item, draft, dirty, error, onChange }: ProductRowProps) {
+const inputBase =
+  "tabular h-12 w-full rounded-md border-[1.5px] bg-white pr-3 text-lg font-bold text-charcoal " +
+  "transition-[border-color,box-shadow] duration-150 placeholder:text-[0.9375rem] placeholder:font-normal placeholder:text-[#8a8270] " +
+  "focus:border-olive-700 focus:shadow-[0_0_0_4px_rgb(92_90_44/0.15)] focus:outline-none";
+
+function ProductRow({ item, draft, dirty, error, stockError, stockEnabled, onChange }: ProductRowProps) {
   const priceId = `price-${item.id}`;
-  const errorId = `${priceId}-error`;
-  const hintId = `${priceId}-hint`;
+  const stockId = `stock-${item.id}`;
   const parsed = parsePriceInput(draft.price);
+  const stock = parseStockInput(draft.stock);
+  const status = statusText(draft);
+
+  const onStockChange = (value: string) => {
+    const next = parseStockInput(value);
+    // Cargar unidades vuelve a habilitar el producto (si se había agotado solo).
+    const reenable = next.ok && next.value !== null && next.value > 0 && !draft.available;
+    onChange(reenable ? { stock: value, available: true } : { stock: value });
+  };
 
   return (
     <li className={cn("rounded-xl bg-white p-4 shadow-card sm:p-5", dirty && "ring-2 ring-mustard")}>
@@ -231,11 +291,11 @@ function ProductRow({ item, draft, dirty, error, onChange }: ProductRowProps) {
           <Image src={item.image.src} alt="" fill sizes="56px" className="object-cover" />
         </div>
         <div className="min-w-0 flex-1">
-          <p translate="no" className="truncate font-display text-[1.5rem] leading-none text-charcoal">
+          <p translate="no" className="font-display text-[1.5rem] leading-[0.95] text-charcoal">
             {item.name}
           </p>
-          <p className={cn("mt-1 text-[0.75rem] font-semibold", draft.active && draft.available ? "text-olive-700" : "text-ink-muted")}>
-            {statusText(draft)}
+          <p className={cn("mt-1 text-[0.75rem] font-semibold", status.orderable ? "text-olive-700" : "text-ink-muted")}>
+            {status.text}
           </p>
         </div>
         {dirty ? (
@@ -245,8 +305,8 @@ function ProductRow({ item, draft, dirty, error, onChange }: ProductRowProps) {
         ) : null}
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,11rem)_1fr_1fr] sm:items-start">
-        <div>
+      <div className={cn("mt-4 grid gap-3", stockEnabled ? "grid-cols-2" : "sm:max-w-[13rem]")}>
+        <div className="min-w-0">
           <label htmlFor={priceId} className="mb-1.5 block text-[0.8125rem] font-bold">
             Precio
           </label>
@@ -265,29 +325,53 @@ function ProductRow({ item, draft, dirty, error, onChange }: ProductRowProps) {
                 if (parsed.ok) onChange({ price: formatPriceInput(parsed.value) });
               }}
               aria-invalid={Boolean(error)}
-              aria-describedby={error ? errorId : hintId}
-              className={cn(
-                "tabular h-12 w-full rounded-md border-[1.5px] bg-white pr-3 pl-8 text-lg font-bold text-charcoal",
-                "transition-[border-color,box-shadow] duration-150 placeholder:text-[0.9375rem] placeholder:font-normal placeholder:text-[#8a8270]",
-                "focus:border-olive-700 focus:shadow-[0_0_0_4px_rgb(92_90_44/0.15)] focus:outline-none",
-                error ? "border-danger" : "border-charcoal/15",
-              )}
+              aria-describedby={`${priceId}-msg`}
+              className={cn(inputBase, "pl-8", error ? "border-danger" : "border-charcoal/15")}
             />
           </div>
-          {error ? (
-            <p id={errorId} className="mt-1.5 text-[0.75rem] font-semibold text-danger">
-              {error}
-            </p>
-          ) : (
-            <p id={hintId} className="mt-1.5 text-[0.75rem] text-ink-muted">
-              {parsed.ok && parsed.value !== null ? `En la web: ${formatPrice(parsed.value)}` : "Vacío = \"Precio a confirmar\""}
-            </p>
-          )}
+          <p id={`${priceId}-msg`} className={cn("mt-1.5 text-[0.75rem]", error ? "font-semibold text-danger" : "text-ink-muted")}>
+            {error ?? (parsed.ok && parsed.value !== null ? `En la web: ${formatPrice(parsed.value)}` : "Vacío = \"Precio a confirmar\"")}
+          </p>
         </div>
 
+        {stockEnabled ? (
+          <div className="min-w-0">
+            <label htmlFor={stockId} className="mb-1.5 block text-[0.8125rem] font-bold">
+              Unidades hoy
+            </label>
+            <input
+              id={stockId}
+              inputMode="numeric"
+              autoComplete="off"
+              value={draft.stock}
+              placeholder="Sin límite"
+              onChange={(e) => onStockChange(e.target.value)}
+              aria-invalid={Boolean(stockError)}
+              aria-describedby={`${stockId}-msg`}
+              className={cn(inputBase, "pl-3.5", stockError ? "border-danger" : "border-charcoal/15")}
+            />
+            <p id={`${stockId}-msg`} className={cn("mt-1.5 text-[0.75rem]", stockError ? "font-semibold text-danger" : "text-ink-muted")}>
+              {stockError ??
+                (!stock.ok || stock.value === null
+                  ? "Vacío = sin límite"
+                  : stock.value === 0
+                    ? "En 0 aparece agotado"
+                    : "Baja sola con cada pedido")}
+            </p>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <Switch
           label="Hay stock hoy"
-          hint={draft.available ? "Se puede pedir" : "Muestra \"Por hoy se fue de vacaciones\""}
+          hint={
+            !draft.available
+              ? "Muestra \"Por hoy se fue de vacaciones\""
+              : stock.ok && stock.value === 0
+                ? "Sin unidades: cargá más para venderlo"
+                : "Se puede pedir"
+          }
           checked={draft.available}
           onChange={(available) => onChange({ available })}
         />
@@ -314,7 +398,7 @@ function Switch({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex min-h-12 cursor-pointer items-center justify-between gap-3 rounded-md border-[1.5px] border-charcoal/10 bg-cream/60 px-3 py-2 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-charcoal sm:mt-[1.6875rem]">
+    <label className="flex min-h-12 cursor-pointer items-center justify-between gap-3 rounded-md border-[1.5px] border-charcoal/10 bg-cream/60 px-3 py-2 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-charcoal">
       <span className="min-w-0">
         <span className="block text-[0.875rem] font-bold text-charcoal">{label}</span>
         <span className="block text-[0.6875rem] leading-snug text-ink-muted">{hint}</span>

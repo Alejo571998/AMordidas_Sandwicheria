@@ -36,6 +36,8 @@ export interface Product {
   available: boolean;
   /** `false` = no aparece en la carta (producto discontinuado o en pausa). */
   active: boolean;
+  /** Unidades que quedan hoy (se cargan desde el panel). Ausente o `null` = sin límite. */
+  stock?: number | null;
   featured?: boolean;
   /** Etiqueta destacada sobre la foto. Ej: "Nuevo". */
   badge?: string | null;

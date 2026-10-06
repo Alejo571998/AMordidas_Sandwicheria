@@ -16,6 +16,7 @@ Hay dos formas de cambiar la carta:
 Página privada para que el dueño cambie, desde el celular y sin tocar código:
 
 - **Precio** de cada producto (vacío = "Precio a confirmar").
+- **Unidades hoy**: cuántas quedan (vacío = sin límite). Ver [Stock por unidades](#stock-por-unidades).
 - **Hay stock hoy**: apagado muestra "Por hoy se fue de vacaciones 😴" y no se puede pedir.
 - **Se muestra en la carta**: apagado lo oculta de la web.
 - **Su contraseña** (*Tu cuenta y contraseña*).
@@ -44,6 +45,7 @@ Si alguna vez `/admin` dice "El panel todavía no está activo", faltan las vari
 **2. Crear las tablas**
 
 - En el proyecto: *SQL Editor* → *New query* → pegá todo el contenido de [`supabase/schema.sql`](../supabase/schema.sql) → *Run*.
+- Después, otra consulta con [`supabase/migrations/002_stock.sql`](../supabase/migrations/002_stock.sql) → *Run* (stock por unidades).
 
 **3. Cerrar el registro y crear la cuenta del dueño**
 
@@ -75,6 +77,24 @@ Si alguna vez `/admin` dice "El panel todavía no está activo", faltan las vari
 **6. Probar**
 
 - Entrá a `https://a-mordidas-sandwicheria.vercel.app/admin`, iniciá sesión, cambiá un precio y guardá. Abrí la web en otra pestaña: tiene que verse el precio nuevo.
+
+### Stock por unidades
+
+**Para activarlo (una sola vez):** Supabase → *SQL Editor* → *New query* → pegá todo [`supabase/migrations/002_stock.sql`](../supabase/migrations/002_stock.sql) → *Run*. Hasta que se corra, el panel muestra un aviso y todo funciona como antes (sin contar unidades).
+
+**Cómo funciona:**
+
+- En el panel, cada producto tiene **Unidades hoy**. Vacío = sin límite (como siempre).
+- La web no deja pedir más de lo que hay: si quedan 3, el cliente puede sumar hasta 3 y ve "Hay para 3 nomás". Con 5 o menos aparece "¡Quedan N!" sobre la foto.
+- Las unidades **se descuentan cuando el cliente toca "Enviar pedido"**. Lo hace la base en un solo paso: si dos personas piden la última unidad al mismo tiempo, solo una se la lleva. A la otra se le avisa y no se abre WhatsApp hasta que ajuste el pedido.
+- Al llegar a 0, el producto queda **"Por hoy se fue de vacaciones"** solo. Para volver a venderlo, cargá unidades: el interruptor "Hay stock hoy" se prende solo.
+- Debajo de la carta del panel está la lista **"Pedidos que descontaron stock hoy"** (hora y productos, sin datos del cliente).
+
+**Lo que hay que saber:**
+
+- La web no puede saber si el cliente realmente mandó el WhatsApp. Si alguien toca "Enviar pedido" y no lo manda, esas unidades quedan descontadas: comparalo con la lista del panel y volvé a sumarlas.
+- Si la base no responde (o hay demasiados pedidos seguidos, un freno contra abusos), **el pedido sale igual por WhatsApp sin descontar**: nunca se pierde una venta por la web. Revisá las unidades en el panel.
+- Cada pedido tiene un tope de 20 unidades por producto. Los registros de pedidos se borran solos a los 3 días.
 
 ### Bueno saber
 

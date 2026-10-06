@@ -8,6 +8,7 @@ import { Icon } from "@/components/ui/Icon";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { track } from "@/lib/analytics";
 import { MAX_QUANTITY_PER_ITEM } from "@/lib/cart/reducer";
+import { isStockLimited, LOW_STOCK_THRESHOLD, lowStockBadge, orderLimit, stockLeftMessage } from "@/lib/stock";
 import { cn, formatPrice } from "@/lib/format";
 import type { Product } from "@/types/product";
 
@@ -27,10 +28,14 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
   const ref = useRef<HTMLElement>(null);
   const addedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const inCart = hydrated && product.available ? quantityOf(product.id) : 0;
-  // Tope por producto: el selector nunca ofrece más de lo que entra en el pedido.
-  const remaining = MAX_QUANTITY_PER_ITEM - inCart;
+  // Tope por producto (20) o stock del día: el selector nunca ofrece más de lo que se puede pedir.
+  const stock = product.stock ?? null;
+  const stockLimited = isStockLimited(product);
+  const remaining = orderLimit(product) - inCart;
   const atLimit = remaining <= 0;
   const qty = Math.min(quantity, Math.max(1, remaining));
+  const showStockHint = product.available && stockLimited && stock !== null && stock > 0 && qty >= remaining;
+  const lowStock = product.available && stock !== null && stock > 0 && stock <= LOW_STOCK_THRESHOLD;
   const isWide = layout === "wide";
   const isVeggie = product.tags?.includes("vegetariano");
 
@@ -96,6 +101,11 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
             <span className="inline-flex items-center gap-1 rounded-xs bg-olive-700 px-2 py-1 text-[0.6875rem] font-bold tracking-[0.12em] text-cream uppercase">
               <Icon name="leaf" size={12} />
               Veggie
+            </span>
+          ) : null}
+          {lowStock && stock !== null ? (
+            <span className="rounded-xs bg-mustard px-2 py-1 text-[0.6875rem] font-bold tracking-[0.12em] text-charcoal uppercase">
+              {lowStockBadge(stock)}
             </span>
           ) : null}
         </div>
@@ -174,52 +184,67 @@ export function ProductCard({ product, categoryLabel, layout = "card" }: Product
         {/* @container: el total dentro del botón solo aparece si entra (en tarjetas angostas se ve al lado del nombre). */}
         <div className="@container mt-auto pt-5">
           {product.available ? (
-            <div className="flex items-center gap-2">
-              <QuantityStepper
-                value={qty}
-                max={Math.max(1, remaining)}
-                itemLabel={product.name}
-                onDecrement={() => setQuantity(Math.max(1, qty - 1))}
-                onIncrement={() => setQuantity(qty + 1)}
-                tone="paper"
-              />
-              <button
-                type="button"
-                onClick={handleAdd}
-                disabled={atLimit && !justAdded}
-                aria-label={
-                  justAdded
-                    ? `${product.name} agregado al pedido`
-                    : atLimit
-                      ? `Ya tenés el máximo de ${product.name} en tu pedido`
-                      : `Agregar ${qty} ${product.name} al pedido`
-                }
-                className={cn(
-                  "inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-4 text-[0.8125rem] font-bold tracking-[0.06em] whitespace-nowrap uppercase",
-                  "transition-[background-color,transform] duration-200 active:scale-[0.97]",
-                  justAdded
-                    ? "bg-mustard text-charcoal"
-                    : "bg-olive-600 text-white shadow-cta-olive hover:bg-olive-700 disabled:bg-charcoal/10 disabled:text-ink-muted disabled:shadow-none",
-                )}
-              >
-                {justAdded ? (
-                  <>
-                    <Icon name="check" size={18} className="animate-pop" />
-                    Agregado
-                  </>
-                ) : atLimit ? (
-                  <span className="leading-tight whitespace-normal text-balance">Máximo {MAX_QUANTITY_PER_ITEM} por pedido</span>
-                ) : (
-                  <>
-                    <Icon name="plus" size={18} />
-                    Agregar
-                    {product.price !== null ? (
-                      <span className="tabular hidden @min-[20rem]:inline">· {formatPrice(product.price * qty)}</span>
-                    ) : null}
-                  </>
-                )}
-              </button>
-            </div>
+            <>
+              <div className="flex items-center gap-2">
+                <QuantityStepper
+                  value={qty}
+                  max={Math.max(1, remaining)}
+                  itemLabel={product.name}
+                  onDecrement={() => setQuantity(Math.max(1, qty - 1))}
+                  onIncrement={() => setQuantity(qty + 1)}
+                  tone="paper"
+                />
+                <button
+                  type="button"
+                  onClick={handleAdd}
+                  disabled={atLimit && !justAdded}
+                  aria-label={
+                    justAdded
+                      ? `${product.name} agregado al pedido`
+                      : atLimit
+                        ? stockLimited
+                          ? `Ya sumaste las ${stock} unidades que quedan de ${product.name}`
+                          : `Ya tenés el máximo de ${product.name} en tu pedido`
+                        : `Agregar ${qty} ${product.name} al pedido`
+                  }
+                  className={cn(
+                    "inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-4 text-[0.8125rem] font-bold tracking-[0.06em] whitespace-nowrap uppercase",
+                    "transition-[background-color,transform] duration-200 active:scale-[0.97]",
+                    justAdded
+                      ? "bg-mustard text-charcoal"
+                      : "bg-olive-600 text-white shadow-cta-olive hover:bg-olive-700 disabled:bg-charcoal/10 disabled:text-ink-muted disabled:shadow-none",
+                  )}
+                >
+                  {justAdded ? (
+                    <>
+                      <Icon name="check" size={18} className="animate-pop" />
+                      Agregado
+                    </>
+                  ) : atLimit ? (
+                    <span className="leading-tight whitespace-normal text-balance">
+                      {stockLimited ? "Ya están en tu pedido" : `Máximo ${MAX_QUANTITY_PER_ITEM} por pedido`}
+                    </span>
+                  ) : (
+                    <>
+                      <Icon name="plus" size={18} />
+                      Agregar
+                      {product.price !== null ? (
+                        <span className="tabular hidden @min-[20rem]:inline">· {formatPrice(product.price * qty)}</span>
+                      ) : null}
+                    </>
+                  )}
+                </button>
+              </div>
+              {/* El stock manda: si pedís más de lo que hay, te avisa cuánto queda. */}
+              <p aria-live="polite" className="min-h-0 text-[0.8125rem] font-semibold text-orange-700">
+                {showStockHint && stock !== null ? (
+                  <span className="mt-2 flex items-center gap-1.5">
+                    <Icon name="info" size={16} className="shrink-0" />
+                    {stockLeftMessage(stock)}
+                  </span>
+                ) : null}
+              </p>
+            </>
           ) : (
             <button
               type="button"

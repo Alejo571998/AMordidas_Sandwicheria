@@ -42,6 +42,27 @@ export function getOpenStatus(ranges: readonly TimeRange[], date: Date, timeZone
   return { open: false, next: upcoming.r.open };
 }
 
+/** Medianoche de hoy en la zona horaria del negocio, en ISO (para filtrar "lo de hoy" en la base). */
+export function startOfLocalDay(timeZone: string, now: Date = new Date()): string {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(now)
+      .map((p) => [p.type, Number(p.value)]),
+  ) as Record<string, number>;
+  const localAsUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+  const offsetMs = localAsUtc - Math.floor(now.getTime() / 1000) * 1000;
+  return new Date(Date.UTC(parts.year, parts.month - 1, parts.day) - offsetMs).toISOString();
+}
+
 /** "10:30 a 17:30 · 19:00 a 00:30" */
 export function formatRanges(ranges: readonly TimeRange[]): string {
   return ranges.map((r) => `${r.open} a ${r.close}`).join(" · ");

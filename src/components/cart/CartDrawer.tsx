@@ -6,7 +6,9 @@ import { Icon } from "@/components/ui/Icon";
 import { siteConfig } from "@/config/site";
 import { track } from "@/lib/analytics";
 import { cn, formatPrice, pluralize } from "@/lib/format";
+import { stockLeftMessage } from "@/lib/stock";
 import { buildOrderMessage, buildWhatsAppUrl } from "@/lib/whatsapp";
+import { reserveOrder, type ReserveResult } from "@/app/(site)/actions";
 import { ClearCartButton, CartLineItem, EmptyCart, OrderSummary, UnavailableLineItem } from "./CartLines";
 import { CHECKOUT_FORM_ID, CheckoutForm } from "./CheckoutForm";
 import { useCart } from "./CartProvider";
@@ -34,12 +36,18 @@ const progress: Array<{ step: Step; label: string }> = [
 ];
 
 export function CartDrawer() {
-  const { summary, isCartOpen, closeCart, checkout, clearCart, resetCheckout } = useCart();
+  const { summary, isCartOpen, closeCart, checkout, clearCart, resetCheckout, stockControl, applyShortages, products } =
+    useCart();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [rawStep, setStep] = useState<Step>("cart");
   const [sentMessage, setSentMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [sending, setSending] = useState(false);
+  /** false si el navegador bloqueó la ventana de WhatsApp: el paso final ofrece abrirla a mano. */
+  const [opened, setOpened] = useState(true);
+  /** Lo que avisó la base al enviar ("Milandwich Carne: hay para 1 solo."). */
+  const [stockNotice, setStockNotice] = useState<string[] | null>(null);
 
   // Sincroniza el <dialog> nativo con el estado global.
   useEffect(() => {
@@ -59,6 +67,7 @@ export function CartDrawer() {
     setStep("cart");
     setSentMessage(null);
     setCopied(false);
+    setStockNotice(null);
   };
 
   // Click en el fondo oscuro cierra (el <dialog> ocupa solo el panel).
@@ -74,25 +83,62 @@ export function CartDrawer() {
   const message = buildOrderMessage(summary, checkout);
   const whatsappUrl = buildWhatsAppUrl(sentMessage ?? message);
   const isEmpty = summary.lines.length === 0 && summary.unavailable.length === 0;
-  const canContinue = summary.lines.length > 0;
-  // Si el pedido queda vacío a mitad del checkout (ej: se vació en otra pestaña), volvemos al paso 1.
+  const canContinue = summary.lines.length > 0 && !summary.hasStockIssues;
+  // Si el pedido queda vacío o pide más de lo que hay a mitad del checkout, volvemos al paso 1.
   const step: Step = (rawStep === "details" || rawStep === "confirm") && !canContinue ? "cart" : rawStep;
 
   const startCheckout = () => {
     track("checkout_start", { item_count: summary.itemCount, total: summary.total });
+    setStockNotice(null);
     goTo("details");
   };
 
-  const onSend = () => {
+  /** El pedido salió: se limpia el carrito y se muestra el paso final. */
+  const finishSend = (sent: string, didOpen: boolean) => {
     track("whatsapp_order_click", { item_count: summary.itemCount, total: summary.total, mode: checkout.mode });
+    setSentMessage(sent);
+    setOpened(didOpen);
+    clearCart();
+    resetCheckout();
+    goTo("sent");
+  };
+
+  // Sin control de stock: el link abre WhatsApp primero; después (diferido) limpiamos el pedido.
+  const onSendLink = () => {
     const sent = message;
-    // Diferido: el link abre WhatsApp primero; después limpiamos el pedido.
-    setTimeout(() => {
-      setSentMessage(sent);
-      clearCart();
-      resetCheckout();
-      goTo("sent");
-    }, 60);
+    setTimeout(() => finishSend(sent, true), 60);
+  };
+
+  // Con control de stock: primero la base descuenta lo pedido; si no alcanza, no se abre WhatsApp.
+  const onSendWithStock = async () => {
+    const sent = message;
+    const url = whatsappUrl;
+    setSending(true);
+    let result: ReserveResult;
+    try {
+      result = await reserveOrder(summary.lines.map((l) => ({ productId: l.product.id, quantity: l.quantity })));
+    } catch {
+      result = { status: "skipped" }; // sin conexión con el servidor: el pedido sale igual
+    }
+    setSending(false);
+
+    if (result.status === "shortage") {
+      const names = new Map(products.map((p) => [p.id, p.name]));
+      setStockNotice(
+        result.shortages.map((s) =>
+          s.available === 0
+            ? `${names.get(s.productId) ?? "Un producto"}: se agotó recién.`
+            : `${names.get(s.productId) ?? "Un producto"}: ${stockLeftMessage(s.available).toLowerCase()}`,
+        ),
+      );
+      applyShortages(result.shortages);
+      goTo("cart");
+      return;
+    }
+
+    const win = window.open(url, "_blank");
+    if (win) win.opener = null;
+    finishSend(sent, Boolean(win));
   };
 
   const copyOrder = async () => {
@@ -165,6 +211,22 @@ export function CartDrawer() {
               <EmptyCart onBrowse={browseMenu} />
             ) : (
               <>
+                {stockNotice ? (
+                  <div role="alert" className="mt-4 rounded-lg bg-orange-600/10 p-3 text-[0.875rem]">
+                    <p className="flex items-center gap-2 font-bold text-orange-700">
+                      <Icon name="info" size={18} className="shrink-0" />
+                      Mientras armabas el pedido se vendieron algunos
+                    </p>
+                    <ul className="mt-1.5 space-y-0.5 pl-[1.625rem] text-charcoal">
+                      {stockNotice.map((line) => (
+                        <li key={line} translate="no">
+                          {line}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-1.5 pl-[1.625rem] text-ink-muted">Ajustamos tu pedido: revisalo y seguí.</p>
+                  </div>
+                ) : null}
                 <ul className="divide-y divide-charcoal/8">
                   {summary.lines.map((line) => (
                     <CartLineItem key={line.product.id} line={line} />
@@ -224,12 +286,33 @@ export function CartDrawer() {
               <span className="grid size-20 animate-pop place-items-center rounded-full bg-mustard text-charcoal">
                 <Icon name="check" size={40} />
               </span>
-              <p className="mt-6 font-display text-display-md">Abrimos WhatsApp con tu pedido</p>
-              <p className="mt-2 max-w-xs text-ink-muted">
-                Mandá el mensaje y te confirmamos por ahí. Gracias por elegirnos.
-              </p>
+              {opened ? (
+                <>
+                  <p className="mt-6 font-display text-display-md">Abrimos WhatsApp con tu pedido</p>
+                  <p className="mt-2 max-w-xs text-ink-muted">
+                    Mandá el mensaje y te confirmamos por ahí. Gracias por elegirnos.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="mt-6 font-display text-display-md">Tu pedido está listo</p>
+                  <p className="mt-2 max-w-xs text-ink-muted">Tocá el botón para abrirlo en WhatsApp y mandarlo.</p>
+                  <ButtonLink
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setOpened(true)}
+                    variant="whatsapp"
+                    size="lg"
+                    className="mt-6 w-full"
+                  >
+                    <Icon name="whatsapp" size={20} />
+                    Abrir WhatsApp
+                  </ButtonLink>
+                </>
+              )}
               <div className="mt-8 w-full rounded-lg bg-paper/70 p-4 text-left">
-                <p className="font-bold">¿No se abrió WhatsApp?</p>
+                <p className="font-bold">{opened ? "¿No se abrió WhatsApp?" : "¿Preferís mandarlo vos?"}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <ButtonLink href={whatsappUrl} target="_blank" rel="noopener noreferrer" variant="whatsapp" size="sm">
                     <Icon name="whatsapp" size={16} />
@@ -282,18 +365,25 @@ export function CartDrawer() {
 
           {step === "confirm" ? (
             <>
-              <ButtonLink
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={onSend}
-                variant="whatsapp"
-                size="lg"
-                className="w-full"
-              >
-                <Icon name="whatsapp" size={20} />
-                Enviar pedido
-              </ButtonLink>
+              {stockControl ? (
+                <Button onClick={onSendWithStock} disabled={sending} variant="whatsapp" size="lg" className="w-full">
+                  <Icon name="whatsapp" size={20} />
+                  {sending ? "Confirmando stock…" : "Enviar pedido"}
+                </Button>
+              ) : (
+                <ButtonLink
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={onSendLink}
+                  variant="whatsapp"
+                  size="lg"
+                  className="w-full"
+                >
+                  <Icon name="whatsapp" size={20} />
+                  Enviar pedido
+                </ButtonLink>
+              )}
               <button
                 type="button"
                 onClick={() => goTo("details")}

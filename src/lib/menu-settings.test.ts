@@ -18,6 +18,7 @@ describe("parseSettingsRows", () => {
       price: 9000,
       available: false,
       active: true,
+      stock: null, // fila sin columna stock (base antes de la migración 002)
       updatedAt: "2026-10-05T12:00:00Z",
     });
     expect(map.get("classic")?.price).toBeNull();
@@ -70,5 +71,35 @@ describe("applySettings", () => {
 
   it("sin filas devuelve la carta tal cual", () => {
     expect(applySettings(products, new Map())).toBe(products);
+  });
+});
+
+describe("stock por unidades", () => {
+  it("lee el stock y rechaza valores inválidos", () => {
+    const map = parseSettingsRows(
+      [
+        { product_id: "gula", price: 8490, available: true, active: true, stock: 3 },
+        { product_id: "crudo", price: 14190, available: true, active: true, stock: -1 },
+        { product_id: "classic", price: 9150, available: true, active: true, stock: 2.5 },
+      ],
+      known,
+    );
+    expect(map.get("gula")?.stock).toBe(3);
+    expect(map.has("crudo")).toBe(false);
+    expect(map.has("classic")).toBe(false);
+  });
+
+  it("con stock en 0 el producto queda agotado aunque el interruptor esté prendido", () => {
+    const map = parseSettingsRows([{ product_id: "gula", price: 8490, available: true, active: true, stock: 0 }], known);
+    const gula = applySettings(products, map).find((p) => p.id === "gula")!;
+    expect(gula.available).toBe(false);
+    expect(gula.stock).toBe(0);
+  });
+
+  it("con unidades, el producto se puede pedir y lleva el stock", () => {
+    const map = parseSettingsRows([{ product_id: "gula", price: 8490, available: true, active: true, stock: 2 }], known);
+    const gula = applySettings(products, map).find((p) => p.id === "gula")!;
+    expect(gula.available).toBe(true);
+    expect(gula.stock).toBe(2);
   });
 });

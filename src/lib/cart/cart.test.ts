@@ -150,6 +150,32 @@ describe("summarizeCart", () => {
     expect(s.itemCount).toBe(1);
   });
 
+  it("stock del día: marca la línea que pide más de lo que hay y frena el pedido", () => {
+    const withStock = new Map([
+      ["carne", product({ id: "carne", price: 12560, stock: 1 })],
+      ["gula", product({ id: "gula", price: 8490, stock: 5 })],
+    ]);
+    const s = summarizeCart(
+      [
+        { productId: "carne", quantity: 2 },
+        { productId: "gula", quantity: 3 },
+      ],
+      withStock,
+    );
+    const carne = s.lines.find((l) => l.product.id === "carne")!;
+    expect(carne.maxQuantity).toBe(1);
+    expect(carne.overStock).toBe(true);
+    expect(s.lines.find((l) => l.product.id === "gula")!.overStock).toBe(false);
+    expect(s.hasStockIssues).toBe(true);
+  });
+
+  it("stock en 0 cuenta como agotado y no va en el pedido", () => {
+    const s = summarizeCart([{ productId: "x", quantity: 1 }], new Map([["x", product({ id: "x", stock: 0 })]]));
+    expect(s.lines).toHaveLength(0);
+    expect(s.unavailable).toHaveLength(1);
+    expect(s.hasStockIssues).toBe(false);
+  });
+
   it("carrito vacío", () => {
     const s = summarizeCart([], catalog);
     expect(s).toMatchObject({ itemCount: 0, subtotal: 0, total: 0, hasPendingPrices: false });

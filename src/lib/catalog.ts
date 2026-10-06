@@ -67,7 +67,8 @@ export const knownProductIds: ReadonlySet<string> = new Set(rawProducts.map((p) 
 async function fetchPublicSettings(): Promise<SettingsMap> {
   const env = getSupabaseEnv();
   if (!env) return new Map();
-  const url = `${env.url}/rest/v1/product_settings?select=product_id,price,available,active,updated_at`;
+  // select=*: sigue funcionando si la base todavía no tiene la columna `stock` (migración 002 pendiente).
+  const url = `${env.url}/rest/v1/product_settings?select=*`;
   let res: Response;
   try {
     res = await fetch(url, {

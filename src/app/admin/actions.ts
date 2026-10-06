@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { validatePasswordChange, type PasswordErrors } from "@/lib/admin/password";
 import { getAdminSession } from "@/lib/admin/session";
 import { parsePriceInput } from "@/lib/admin/price";
+import { parseStockInput } from "@/lib/admin/stock-input";
 import { knownProductIds } from "@/lib/catalog";
 import { pluralize } from "@/lib/format";
 import { MENU_CACHE_TAG } from "@/lib/menu-settings";
@@ -70,11 +71,13 @@ export async function saveSettings(_prev: SaveState, formData: FormData): Promis
   if (!Array.isArray(changes) || changes.length === 0) return fail("No hay cambios para guardar.");
   if (changes.length > knownProductIds.size) return fail("Demasiados cambios en un solo envío.");
 
-  const rows: Array<{ product_id: string; price: number | null; available: boolean; active: boolean }> = [];
+  type Row = { product_id: string; price: number | null; available: boolean; active: boolean; stock?: number | null };
+  const rows: Row[] = [];
+  // Errores por campo: "<id>" para el precio y "<id>:stock" para las unidades.
   const errors: Record<string, string> = {};
   for (const change of changes) {
     if (!change || typeof change !== "object") return fail("Cambios inválidos. Recargá la página.");
-    const { productId, price, available, active } = change as Record<string, unknown>;
+    const { productId, price, available, active, stock } = change as Record<string, unknown>;
     if (typeof productId !== "string" || !knownProductIds.has(productId)) {
       return fail("Hay un producto que no existe en la carta. Recargá la página.");
     }
@@ -82,18 +85,29 @@ export async function saveSettings(_prev: SaveState, formData: FormData): Promis
       errors[productId] = "Datos inválidos.";
       continue;
     }
-    const parsed = parsePriceInput(price);
-    if (!parsed.ok) {
-      errors[productId] = parsed.error;
+    if (stock !== undefined && typeof stock !== "string") {
+      errors[`${productId}:stock`] = "Datos inválidos.";
       continue;
     }
-    rows.push({ product_id: productId, price: parsed.value, available, active });
+    const parsedPrice = parsePriceInput(price);
+    if (!parsedPrice.ok) errors[productId] = parsedPrice.error;
+    const parsedStock = stock === undefined ? null : parseStockInput(stock);
+    if (parsedStock && !parsedStock.ok) errors[`${productId}:stock`] = parsedStock.error;
+    if (!parsedPrice.ok || (parsedStock && !parsedStock.ok)) continue;
+
+    const row: Row = { product_id: productId, price: parsedPrice.value, available, active };
+    // Solo si el panel mandó unidades (la base puede no tener todavía la columna `stock`).
+    if (parsedStock?.ok) row.stock = parsedStock.value;
+    rows.push(row);
   }
-  if (Object.keys(errors).length > 0) return fail("Revisá los precios marcados en rojo.", errors);
+  if (Object.keys(errors).length > 0) return fail("Revisá los campos marcados en rojo.", errors);
 
   // La base vuelve a verificar que la cuenta sea admin (RLS): esto no depende solo de este chequeo.
   const { error } = await session.supabase.from("product_settings").upsert(rows, { onConflict: "product_id" });
-  if (error) return fail("No se pudo guardar. Probá de nuevo en un rato.");
+  if (error) {
+    if (error.code === "PGRST204") return fail("Falta actualizar la base para guardar unidades (ver docs/ADMIN.md).");
+    return fail("No se pudo guardar. Probá de nuevo en un rato.");
+  }
 
   // La web pública deja de usar la versión cacheada: el próximo visitante ya ve los cambios.
   updateTag(MENU_CACHE_TAG);

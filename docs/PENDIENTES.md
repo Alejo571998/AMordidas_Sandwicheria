@@ -7,6 +7,7 @@ Ningún dato del negocio se inventó. Esto es lo que falta o tiene versiones dis
 | Dato | Estado en la web | Dónde se carga |
 | --- | --- | --- |
 | **Panel de administrador** | Activo en producción. Falta el primer ingreso del dueño (paso 6) | [`docs/ADMIN.md`](ADMIN.md#activarlo-una-sola-vez-15-minutos) |
+| **Stock por unidades** | Programado. Falta correr `supabase/migrations/002_stock.sql` en Supabase | [`docs/ADMIN.md`](ADMIN.md#stock-por-unidades) |
 | Dominio propio | Usa `a-mordidas-sandwicheria.vercel.app` | Variable `NEXT_PUBLIC_SITE_URL` en Vercel |
 
 ## Confirmados por el dueño (5/10/2026)

@@ -8,6 +8,7 @@ import { Icon } from "@/components/ui/Icon";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import type { ResolvedLine } from "@/lib/cart/selectors";
 import { cn, formatPrice } from "@/lib/format";
+import { isStockLimited, stockLeftMessage } from "@/lib/stock";
 import { useCart } from "./CartProvider";
 
 function LineThumb({ line }: { line: ResolvedLine }) {
@@ -20,7 +21,9 @@ function LineThumb({ line }: { line: ResolvedLine }) {
 
 export function CartLineItem({ line }: { line: ResolvedLine }) {
   const { increment, decrement } = useCart();
-  const { product, quantity, lineTotal } = line;
+  const { product, quantity, lineTotal, maxQuantity, overStock } = line;
+  const stockLimited = isStockLimited(product);
+  const atStockLimit = stockLimited && quantity >= maxQuantity;
   return (
     <li className="flex gap-3 py-4">
       <LineThumb line={line} />
@@ -38,11 +41,19 @@ export function CartLineItem({ line }: { line: ResolvedLine }) {
           size="sm"
           removable
           value={quantity}
+          max={maxQuantity}
           itemLabel={product.name}
           onDecrement={() => decrement(product.id)}
           onIncrement={() => increment(product.id)}
           className="self-start"
         />
+        {overStock ? (
+          <p className="text-[0.8125rem] font-semibold text-danger">
+            {stockLeftMessage(maxQuantity)} Bajá la cantidad para seguir.
+          </p>
+        ) : atStockLimit ? (
+          <p className="text-[0.8125rem] font-semibold text-orange-700">{stockLeftMessage(maxQuantity)}</p>
+        ) : null}
       </div>
     </li>
   );

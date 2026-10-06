@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { AdminNotice } from "@/components/admin/AdminNotice";
+import { OrdersToday, type OrderSummaryRow } from "@/components/admin/OrdersToday";
 import { SettingsEditor, type EditableProduct } from "@/components/admin/SettingsEditor";
+import { siteConfig } from "@/config/site";
 import { getAdminSession } from "@/lib/admin/session";
+import { startOfLocalDay } from "@/lib/hours";
 import { getAdminCatalog, knownProductIds } from "@/lib/catalog";
 import { parseSettingsRows } from "@/lib/menu-settings";
 import { logout } from "./actions";
@@ -41,9 +45,11 @@ export default async function AdminPage() {
     );
   }
 
-  const { data, error } = await session.supabase
-    .from("product_settings")
-    .select("product_id, price, available, active, updated_at");
+  // select("*"): funciona antes y después de la migración de stock (002_stock.sql).
+  const [{ data, error }, stockProbe] = await Promise.all([
+    session.supabase.from("product_settings").select("*"),
+    session.supabase.from("product_settings").select("stock").limit(1),
+  ]);
 
   if (error) {
     return (
@@ -53,20 +59,28 @@ export default async function AdminPage() {
     );
   }
 
+  const stockEnabled = !stockProbe.error;
   const settings = parseSettingsRows(data, knownProductIds);
   const { categories, products } = getAdminCatalog(settings);
   const updates = [...settings.values()].map((s) => s.updatedAt).filter((d): d is string => d !== null);
   const lastUpdate = updates.sort().at(-1) ?? null;
 
-  const items: EditableProduct[] = products.map((p) => ({
-    id: p.id,
-    name: p.name,
-    categoryId: p.category,
-    image: p.image,
-    price: p.price,
-    available: p.available,
-    active: p.active,
-  }));
+  // El editor muestra el interruptor tal como está guardado (no el "agotado" que se deduce del stock en 0).
+  const items: EditableProduct[] = products.map((p) => {
+    const saved = settings.get(p.id);
+    return {
+      id: p.id,
+      name: p.name,
+      categoryId: p.category,
+      image: p.image,
+      price: p.price,
+      available: saved ? saved.available : p.available,
+      active: p.active,
+      stock: saved?.stock ?? null,
+    };
+  });
+
+  const orders = stockEnabled ? await loadOrdersToday(session.supabase, new Map(products.map((p) => [p.id, p.name]))) : [];
 
   return (
     <SettingsEditor
@@ -74,6 +88,37 @@ export default async function AdminPage() {
       items={items}
       version={lastUpdate ?? "base"}
       lastUpdate={lastUpdate}
+      stockEnabled={stockEnabled}
+      aside={stockEnabled ? <OrdersToday orders={orders} /> : null}
     />
   );
+}
+
+const timeFormatter = new Intl.DateTimeFormat("es-AR", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+  timeZone: siteConfig.hours.timeZone,
+});
+
+async function loadOrdersToday(supabase: SupabaseClient, names: Map<string, string>): Promise<OrderSummaryRow[]> {
+  const { data, error } = await supabase
+    .from("order_log")
+    .select("id, created_at, items")
+    .gte("created_at", startOfLocalDay(siteConfig.hours.timeZone))
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (error || !Array.isArray(data)) return [];
+  return data.flatMap((row) => {
+    if (typeof row.id !== "number" || typeof row.created_at !== "string" || !Array.isArray(row.items)) return [];
+    const detail = (row.items as unknown[])
+      .flatMap((it) => {
+        const { product_id, quantity } = (it ?? {}) as Record<string, unknown>;
+        return typeof product_id === "string" && typeof quantity === "number"
+          ? [`${quantity}× ${names.get(product_id) ?? product_id}`]
+          : [];
+      })
+      .join(" · ");
+    return [{ id: row.id, time: timeFormatter.format(new Date(row.created_at)), detail }];
+  });
 }

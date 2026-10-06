@@ -1,3 +1,4 @@
+import { orderLimit } from "@/lib/stock";
 import type { Product } from "@/types/product";
 import type { CartLine } from "./reducer";
 
@@ -6,6 +7,10 @@ export interface ResolvedLine {
   quantity: number;
   /** null si el producto todavía no tiene precio cargado. */
   lineTotal: number | null;
+  /** Cuántas unidades pueden ir de este producto (tope general o stock del día). */
+  maxQuantity: number;
+  /** El carrito tiene más de lo que queda en stock. */
+  overStock: boolean;
 }
 
 export interface CartSummary {
@@ -19,6 +24,8 @@ export interface CartSummary {
   /** Total final. null cuando hay al menos un precio pendiente: se confirma por WhatsApp. */
   total: number | null;
   hasPendingPrices: boolean;
+  /** Alguna línea pide más de lo que hay: no se puede continuar hasta ajustarla. */
+  hasStockIssues: boolean;
 }
 
 /**
@@ -31,12 +38,15 @@ export function summarizeCart(lines: CartLine[], productsById: ReadonlyMap<strin
   for (const line of lines) {
     const product = productsById.get(line.productId);
     if (!product) continue;
+    const maxQuantity = orderLimit(product);
     const resolved: ResolvedLine = {
       product,
       quantity: line.quantity,
       lineTotal: product.price === null ? null : product.price * line.quantity,
+      maxQuantity,
+      overStock: line.quantity > maxQuantity,
     };
-    (product.active && product.available ? orderable : unavailable).push(resolved);
+    (product.active && product.available && maxQuantity > 0 ? orderable : unavailable).push(resolved);
   }
   const itemCount = orderable.reduce((n, l) => n + l.quantity, 0);
   const subtotal = orderable.reduce((n, l) => n + (l.lineTotal ?? 0), 0);
@@ -48,5 +58,6 @@ export function summarizeCart(lines: CartLine[], productsById: ReadonlyMap<strin
     subtotal,
     total: hasPendingPrices ? null : subtotal,
     hasPendingPrices,
+    hasStockIssues: orderable.some((l) => l.overStock),
   };
 }

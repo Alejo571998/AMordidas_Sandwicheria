@@ -2,6 +2,7 @@
 -- A MORDIDAS — Base del panel de administración (Supabase / Postgres)
 --
 -- Se ejecuta UNA vez en el SQL Editor del proyecto nuevo (ver docs/ADMIN.md).
+-- Después: migrations/002_stock.sql (stock por unidades).
 -- Se puede volver a ejecutar sin romper nada.
 --
 -- Qué guarda: solo lo que el dueño cambia desde /admin (precio, stock, visibilidad).

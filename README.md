@@ -49,7 +49,7 @@ src/
   lib/            catálogo, ajustes del panel, Supabase, carrito, WhatsApp, checkout, horarios, analytics, SEO
   proxy.ts        renueva la sesión del panel (solo /admin)
 docs/             ADMIN.md · PENDIENTES.md · DESIGN-SYSTEM.md
-supabase/         schema.sql (tablas, RLS y permisos del panel)
+supabase/         schema.sql (tablas, RLS y permisos del panel) + migrations/002_stock.sql (stock por unidades)
 scripts/          product-image.mjs
 ```
 
