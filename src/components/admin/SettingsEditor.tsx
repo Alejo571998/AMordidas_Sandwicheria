@@ -54,7 +54,16 @@ export function SettingsEditor({ categories, items, version, lastUpdate }: Setti
   return (
     <form action={formAction} className="container-page max-w-3xl pt-8 pb-40 sm:pt-12">
       <header>
-        <p className="eyebrow text-orange-600">Panel</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="eyebrow text-orange-600">Panel</p>
+          <a
+            href="/admin/cuenta"
+            className="-mr-2 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-[0.8125rem] font-semibold text-ink-muted hover:text-charcoal"
+          >
+            Tu cuenta y contraseña
+            <Icon name="arrowRight" size={16} />
+          </a>
+        </div>
         <h1 className="mt-2 font-display text-display-lg text-charcoal">Precios y stock</h1>
         <p className="mt-2 text-ink-muted">
           Lo que guardes acá se ve en la web al instante.

@@ -2,6 +2,7 @@
 
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { validatePasswordChange, type PasswordErrors } from "@/lib/admin/password";
 import { getAdminSession } from "@/lib/admin/session";
 import { parsePriceInput } from "@/lib/admin/price";
 import { knownProductIds } from "@/lib/catalog";
@@ -101,4 +102,57 @@ export async function saveSettings(_prev: SaveState, formData: FormData): Promis
     message: `Listo: ${pluralize(rows.length, "cambio guardado", "cambios guardados")}. Ya se ve en la web.`,
     errors: {},
   };
+}
+
+export interface PasswordState {
+  status: "idle" | "saved" | "error";
+  message: string | null;
+  errors: PasswordErrors;
+}
+
+export async function changePassword(_prev: PasswordState, formData: FormData): Promise<PasswordState> {
+  const session = await getAdminSession();
+  if (session.status !== "admin" || !session.email) {
+    return { status: "error", message: "Tu sesión se cerró. Entrá de nuevo para cambiar la contraseña.", errors: {} };
+  }
+
+  const current = String(formData.get("current") ?? "").slice(0, 200);
+  const next = String(formData.get("next") ?? "").slice(0, 200);
+  const confirm = String(formData.get("confirm") ?? "").slice(0, 200);
+  const errors = validatePasswordChange({ current, next, confirm });
+  if (Object.keys(errors).length > 0) return { status: "error", message: "Revisá los campos marcados.", errors };
+
+  const { supabase, email } = session;
+
+  // Se verifica la contraseña actual siempre, aunque el proyecto de Supabase no lo exija:
+  // así nadie puede cambiarla con una sesión que quedó abierta en otro dispositivo.
+  const { error: authError } = await supabase.auth.signInWithPassword({ email, password: current });
+  if (authError) {
+    if (authError.status === 429) {
+      return { status: "error", message: "Demasiados intentos. Esperá unos minutos y probá de nuevo.", errors: {} };
+    }
+    return { status: "error", message: "Revisá los campos marcados.", errors: { current: "La contraseña actual no es correcta." } };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: next, current_password: current });
+  if (error) {
+    if (error.code === "same_password") {
+      return { status: "error", message: "Revisá los campos marcados.", errors: { next: "Tiene que ser distinta de la actual." } };
+    }
+    if (error.code === "weak_password") {
+      return {
+        status: "error",
+        message: "Revisá los campos marcados.",
+        errors: { next: "Es muy fácil de adivinar. Probá con una frase más larga." },
+      };
+    }
+    if (error.status === 429) {
+      return { status: "error", message: "Demasiados intentos. Esperá unos minutos y probá de nuevo.", errors: {} };
+    }
+    return { status: "error", message: "No se pudo cambiar la contraseña. Probá de nuevo en un rato.", errors: {} };
+  }
+
+  // Cierra las sesiones abiertas en otros dispositivos; esta queda activa.
+  await supabase.auth.signOut({ scope: "others" });
+  return { status: "saved", message: "Listo: tu contraseña cambió. Se cerraron las sesiones de otros dispositivos.", errors: {} };
 }

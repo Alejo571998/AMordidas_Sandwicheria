@@ -71,6 +71,10 @@ export function LoginForm() {
       <Button type="submit" variant="action" size="lg" className="w-full" disabled={pending}>
         {pending ? "Entrando…" : "Entrar"}
       </Button>
+
+      <p className="text-center text-[0.8125rem] text-ink-muted">
+        ¿Te olvidaste la contraseña? Pedile a quien administra la web que te genere una nueva.
+      </p>
     </form>
   );
 }

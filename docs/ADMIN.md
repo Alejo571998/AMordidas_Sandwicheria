@@ -18,6 +18,7 @@ Página privada para que el dueño cambie, desde el celular y sin tocar código:
 - **Precio** de cada producto (vacío = "Precio a confirmar").
 - **Hay stock hoy**: apagado muestra "Por hoy se fue de vacaciones 😴" y no se puede pedir.
 - **Se muestra en la carta**: apagado lo oculta de la web.
+- **Su contraseña** (*Tu cuenta y contraseña*).
 
 Los cambios se ven en la web apenas se guardan.
 
@@ -80,7 +81,8 @@ Si alguna vez `/admin` dice "El panel todavía no está activo", faltan las vari
 - **Primer guardado:** mientras un producto no se haya guardado nunca desde el panel, usa el valor de `products.ts`. Después de guardarlo, manda lo del panel.
 - **Supabase gratis se pausa** si pasa una semana sin uso. Para evitarlo, Vercel corre todos los días una tarea (`/api/keepalive`, configurada en `vercel.json`) que hace una consulta liviana. Si igual se pausara: en Supabase, *Restore project*.
 - **Si la base no responde**, la web sigue mostrando la última versión buena (no vuelve a precios viejos). Un deploy nuevo con la base caída falla a propósito, con un mensaje claro, y Vercel deja publicada la versión anterior.
-- **Cambiar la contraseña del dueño:** Supabase → *Authentication* → *Users* → el usuario → *Send password recovery* o *Reset password*.
+- **Cambiar la contraseña:** desde el panel, *Tu cuenta y contraseña* (arriba a la derecha en "Precios y stock"). Pide la actual, exige al menos 10 caracteres y cierra las sesiones abiertas en otros dispositivos.
+- **Si el dueño se olvida la contraseña:** Supabase → *Authentication* → *Users* → borrar el usuario → crearlo de nuevo con una contraseña nueva (paso 3) → repetir el `insert` en `admins` (paso 4). Después la puede cambiar él desde el panel.
 - **Sumar otra persona:** crear su usuario (paso 3) y agregarla a `admins` (paso 4). Para quitarle el acceso: `delete from public.admins where user_id = '…';`.
 
 ---
